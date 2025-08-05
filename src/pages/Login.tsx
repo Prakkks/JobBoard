@@ -1,19 +1,38 @@
 import { useNavigate } from "react-router-dom";
 import { ConstantValue } from "../constants/constant";
-import { useState } from "react";
+import {  useEffect, useState } from "react";
+import Notification from "../Components/Notification";
+import axios from "axios";
 
 interface Props {
   type: "SignIn" | "SignUp";
 }
 
+
+
+
 const Login = ({ type }: Props) => {
-  const navigate = useNavigate();
+  // const  baseurl = process.env.
+
+// const apiUrl = process.env.REACT_APP_API_URL;  
+const navigate = useNavigate();
   const [loading,setLoading] = useState(false);
+  const [content, setContent ] = useState ("");
+  const [showNotification , setShowNotification] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
     name: "",
   });
+
+  function servenotification() {
+  setShowNotification(true);
+       setTimeout(() => {
+        setShowNotification(false);
+      },2000);
+
+    setLoading(false);
+}
 
   const handleClick = () => {
     if (type == "SignIn") {
@@ -23,28 +42,64 @@ const Login = ({ type }: Props) => {
     }
   };
 
-  const handleSubmit = (e:React.FormEvent)=> {
+  const handleSubmit = async(e:React.FormEvent)=> {
     e.preventDefault();
+    
     setLoading(true);
     let data:{ name?: string; email: string; password: string } = {
         'email' : formData.email,
         'password' : formData.password,
     }
+
     if (type === 'SignUp') {
         data = { ...data , name: formData.name  }
-    }   
+        try {
+          const response = await axios.post('https://jg4npv8c-4000.inc1.devtunnels.ms/api/auth/register', data);
+          setContent( ` Hurray! ${response['data']['message']}`);
+          navigate('/login')
+          
+        }
+        catch(e:any)
+        {
+          const errorMessage = e.response?.data?.message || 'Error!';
+          console.log('Error =',errorMessage );
+          setContent(errorMessage);
+        }
+      }   
+
+      if (type == 'SignIn')
+      {
+        try {
+          const response = await axios.post('https://jg4npv8c-4000.inc1.devtunnels.ms/api/auth/login', data);
+          console.log(response.data);
+          setContent(response['data']['message'])
+          localStorage.setItem('token ', response['data']['token']);
+          // localStorage.setItem('user', JSON.stringify({ response?['data']['user']['name'] , email }));
+          navigate('/job-detail')
+        }
+        catch(e:any)
+        {
+          const errorMessage = e.response?.data?.message || 'Error!';
+          console.log('Error = ', errorMessage);
+          setContent(errorMessage);
+        }
+      }
     
     
-    console.log(data);
+    // console.log(data);
     setFormData({
     email: "",
     password: "",
     name: "",
   } );
     
+     servenotification();
     setLoading(false);
-
+   
   }
+
+
+ 
 
   const handleFormValueChange = (e:React.ChangeEvent<HTMLInputElement>)=> {
     const {name,value } = e.target;
@@ -53,6 +108,14 @@ const Login = ({ type }: Props) => {
 
   return (
     <section className="h-[100vh] p-5 flex flex-col gap-10 bg-[#f3f2f1] justify-center items-center  ">
+
+      
+      {showNotification && (
+        <Notification
+         content={content}
+        />
+      )}
+
      <div className='flex flex-col justify-center items-center gap-2'>
       <h1 className="font-bold text-xl sm:text-3xl">{ConstantValue.title} </h1>
       {/* <p className="text-lg">{ type == 'SignIn' ? ConstantValue.loginWord : ConstantValue.signUpWord} </p> */}
