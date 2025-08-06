@@ -17,3 +17,16 @@ interface ConstantValueProps
     loginWord: string,
     signUpWord: string,
 }
+
+export interface JobListValues 
+{
+    '_id' : string,
+    'title' : string,
+    'description' : string,
+    'company' : string,
+    'location' : string,
+    'salary' : number,
+    'jobType' : string,
+    'createdAt' : string,
+    "__v" : number,
+}

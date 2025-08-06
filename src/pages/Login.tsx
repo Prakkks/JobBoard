@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { ConstantValue } from "../constants/constant";
-import {  useEffect, useState } from "react";
+import { useState } from "react";
 import Notification from "../Components/Notification";
 import axios from "axios";
 
@@ -14,15 +14,19 @@ interface Props {
 const Login = ({ type }: Props) => {
   // const  baseurl = process.env.
 
-// const apiUrl = process.env.REACT_APP_API_URL;  
+const apiUrl = import.meta.env.VITE_BASE_URL;  
+
 const navigate = useNavigate();
   const [loading,setLoading] = useState(false);
   const [content, setContent ] = useState ("");
+
   const [showNotification , setShowNotification] = useState(false);
+  const [selectedrole, setSelectedRole] = useState<'admin'|'user'|'' >("");
   const [formData, setFormData] = useState({
     email: "",
     password: "",
     name: "",
+
   });
 
   function servenotification() {
@@ -46,15 +50,19 @@ const navigate = useNavigate();
     e.preventDefault();
     
     setLoading(true);
-    let data:{ name?: string; email: string; password: string } = {
+    let data:{ name?: string; email: string; password: string; role?: string } = {
         'email' : formData.email,
         'password' : formData.password,
+        
     }
 
     if (type === 'SignUp') {
-        data = { ...data , name: formData.name  }
+        data = { ...data , name: formData.name , role: selectedrole  }
+        console.log('data =',data );
         try {
-          const response = await axios.post('https://jg4npv8c-4000.inc1.devtunnels.ms/api/auth/register', data);
+          const url = `${apiUrl}/api/auth/register`;
+          console.log(url)
+          const response = await axios.post(apiUrl+'/api/auth/register', data, {timeout:30000});
           setContent( ` Hurray! ${response['data']['message']}`);
           navigate('/login')
           
@@ -70,23 +78,31 @@ const navigate = useNavigate();
       if (type == 'SignIn')
       {
         try {
-          const response = await axios.post('https://jg4npv8c-4000.inc1.devtunnels.ms/api/auth/login', data);
+          const response = await axios.post(apiUrl+'/api/auth/login', data, {timeout: 30000});
           console.log(response.data);
-          setContent(response['data']['message'])
-          localStorage.setItem('token ', response['data']['token']);
-          // localStorage.setItem('user', JSON.stringify({ response?['data']['user']['name'] , email }));
+          setContent(response['data']['message']);
+          const tokens = JSON.stringify(response['data']['token']);
+          localStorage.setItem('token', tokens);
+          localStorage.setItem('role',response.data.user.role);
+          localStorage.setItem('name',response.data.user.name);
+          localStorage.setItem('email',response.data.user.email);
+
+
+          
+          // axios.defaults.headers.common['Authorization'] = `Bearer ${response['data']['token']}`;
           navigate('/job-detail')
         }
         catch(e:any)
         {
+           
           const errorMessage = e.response?.data?.message || 'Error!';
-          console.log('Error = ', errorMessage);
+          console.log('Error = ', errorMessage);  
           setContent(errorMessage);
         }
       }
     
     
-    // console.log(data);
+    
     setFormData({
     email: "",
     password: "",
@@ -99,7 +115,9 @@ const navigate = useNavigate();
   }
 
 
- 
+  const handleRadioChange = (e:React.ChangeEvent<HTMLInputElement>)=> {
+      setSelectedRole(e.target.value as 'admin'| 'user' | '')
+  }
 
   const handleFormValueChange = (e:React.ChangeEvent<HTMLInputElement>)=> {
     const {name,value } = e.target;
@@ -149,7 +167,8 @@ const navigate = useNavigate();
             onChange={handleFormValueChange}
 
           />
-          <label className="form-label"> Password</label>
+
+           <label className="form-label"> Password</label>
           <input
             type="password"
             required
@@ -161,6 +180,42 @@ const navigate = useNavigate();
             autoComplete= 'off'
           />
 
+          {type == "SignUp" &&
+          (
+            <>
+          <label className=" form-label"> Select Category</label>
+          <div className="flex flex-row gap-5">
+          <label className=" flex flex-row gap-2">
+           
+          <input
+            type= 'radio'
+            required
+            name="category"
+            className=""
+            value={'admin'}
+            checked = {selectedrole === 'admin'}
+            onChange={handleRadioChange}
+
+          />
+           Admin
+          </label>
+           <label className=" flex flex-row gap-2">
+           
+          <input
+            type= 'radio'
+            required
+            name="category"
+            className=""
+            value={'user'}
+            checked = {selectedrole === 'user'}
+            onChange={handleRadioChange}
+
+          />
+           User
+          </label>
+          </div>
+          </>
+          )}
           <button
             type="submit"
             className="mt-5 w-full p-2 bg-gray-700 rounded-xl text-white "
