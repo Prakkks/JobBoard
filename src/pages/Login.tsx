@@ -1,8 +1,9 @@
-import { useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ConstantValue } from "../constants/constant";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import Notification from "../Components/Notification";
 import axios from "axios";
+import { MyContext } from "../ContextProvider/Provider";
 
 interface Props {
   type: "SignIn" | "SignUp";
@@ -12,14 +13,17 @@ interface Props {
 
 
 const Login = ({ type }: Props) => {
-  // const  baseurl = process.env.
-
 const apiUrl = import.meta.env.VITE_BASE_URL;  
 
 const navigate = useNavigate();
+const context = useContext(MyContext);
   const [loading,setLoading] = useState(false);
+  if (!context)
+  {
+    throw Error('error');
+  }
+  const {setUser ,setShowUserTitle} = context;
   const [content, setContent ] = useState ("");
-
   const [showNotification , setShowNotification] = useState(false);
   const [selectedrole, setSelectedRole] = useState<'admin'|'user'|'' >("");
   const [formData, setFormData] = useState({
@@ -81,16 +85,24 @@ const navigate = useNavigate();
           const response = await axios.post(apiUrl+'/api/auth/login', data, {timeout: 30000});
           console.log(response.data);
           setContent(response['data']['message']);
+          const role = response.data.user.role;
+          console.log(role);
           const tokens = JSON.stringify(response['data']['token']);
           localStorage.setItem('token', tokens);
           localStorage.setItem('role',response.data.user.role);
           localStorage.setItem('name',response.data.user.name);
           localStorage.setItem('email',response.data.user.email);
-
-
+          setUser({'name':response.data.user.name, 'email': response.data.user.email, 'role':response.data.user.role});
+          setShowUserTitle(true);
           
           // axios.defaults.headers.common['Authorization'] = `Bearer ${response['data']['token']}`;
+         if (role == 'admin')
+          {
+            navigate('/');
+          }
+          else
           navigate('/job-detail')
+          
         }
         catch(e:any)
         {
@@ -135,7 +147,7 @@ const navigate = useNavigate();
       )}
 
      <div className='flex flex-col justify-center items-center gap-2'>
-      <h1 className="font-bold text-xl sm:text-3xl">{ConstantValue.title} </h1>
+      <Link to={'/'} className="font-bold text-xl sm:text-3xl hover:text-blue-600">{ConstantValue.title} </Link >
       {/* <p className="text-lg">{ type == 'SignIn' ? ConstantValue.loginWord : ConstantValue.signUpWord} </p> */}
       </div>
       <div className="p-5 rounded-xl bg-white shadow-md w-full sm:w-1/2 md:w-1/3 shadow-gray-300 ">

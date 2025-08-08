@@ -2,6 +2,7 @@ import axios from "axios";
 import { useEffect, useState } from "react"
 import type { JobListValues } from "../constants/constant";
 import ListedJobCard from "../Components/ListedJobCard";
+import FilterJob from "../Components/FilterJob";
 
 
 const JobDetailPage = () => {
@@ -14,9 +15,7 @@ const JobDetailPage = () => {
   useEffect(
 
     ()=> {
-      console.log('You are in JobDetail Page');
-      localStorage.setItem("test", "123456");
-      // console.log(localStorage.getItem("token"));
+      
       axios.get(baseURL+'/api/job/getAllJobs')
       .then((response)=> {
           setJob(response.data.jobs);
@@ -41,11 +40,16 @@ const JobDetailPage = () => {
 
   return (
     
-    <section className="sections flex felx-col ">
-           <div  className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-x-4 gap-y-7 justify-evenly w-full">
+    <section className="sections flex flex-col gap-4  ">
+        
+      <FilterJob />  
+       <div  className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-x-4 gap-y-7 justify-evenly w-full">
        
+
+
+
        {job.length === 0 ? (
-        <p>No jobs available</p>
+        <p>No result found..</p>
       ) : (
         
         job.map((job,index) => {

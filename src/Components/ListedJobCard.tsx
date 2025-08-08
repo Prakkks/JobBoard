@@ -74,7 +74,7 @@ const ListedJobCard = ({keyed,letter,id,title,company,location,salary,jobType,cr
 
                     </div>
                     
-                    <Link to={`/detail-job/${id}`} className=" outline-red-100 self-center rounded-sm font-semibold bg-gray-800 text-white w-full text-center hover:bg-white hover:border-gray-800 hover:border-2 hover:text-gray-900 p-2"> View More to Apply  ￫</Link>
+                    <Link to={`/detail-job/${id}`}  className=" outline-red-100 self-center rounded-sm font-semibold bg-gray-800 text-white w-full text-center hover:bg-white hover:border-gray-800 hover:border-2 hover:text-gray-900 p-2"> View More to Apply  ￫</Link>
                      </div>
   )
 }

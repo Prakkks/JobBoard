@@ -118,6 +118,9 @@ const DetailedJobPage = () => {
           </Link>
         </div>
 
+        {/* serarch job filter based on  location  */}
+        
+
         {/* body */}
         <div className="flex flex-col rounded-md shadow-md p-3 gap-3 sm:p-5 drop-shadow-gray-300">
           <div className="flex flex-row items-center">

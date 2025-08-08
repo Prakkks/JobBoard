@@ -6,8 +6,11 @@ import DetailedJobPage from './pages/DetailedJobPage.tsx';
 import JobPostPage from './pages/JobPostPage.tsx';
 import NotFound from './pages/NotFound.tsx';
 import RouteWithNav from './Routes/RouteWithNav.tsx';
-import RouteWithoutNav from './Routes/ROuteWithoutNav.tsx';
 import { Route, Routes } from 'react-router-dom';
+import RouteWithoutNav from './Routes/RouteWithoutNav.tsx';
+import ProtectedRoute from './Routes/ProtectedRoute.tsx';
+import Unauthorized from './pages/Unauthorized.tsx';
+import Dashboard from './pages/Dashboard.tsx';
 
 const App = () => {
  
@@ -15,22 +18,29 @@ const App = () => {
    <Routes>
          
          <Route element={<RouteWithNav/> }>
-              <Route path="/dashboard" element={<JobApplyPage />} />
-              <Route path='/job-detail' element= {<JobDetailPage />} />
+
               <Route path="/" element={<HomePage />} />
-              <Route path="/post-jobs" element={<JobPostPage />} />
-              <Route path="/detail-job/:id" element={<DetailedJobPage />} />
-              <Route path= '/applyjob' element= {<JobApplyPage />} /> 
               <Route path='/job-detail' element= {<JobDetailPage />} />
-   
+              <Route element= {<ProtectedRoute role={['admin','user']} />}>
+                    <Route path="/dashboard" element={<Dashboard/>} />
+              </Route>
+              <Route element= {<ProtectedRoute role={['user']} />}>
+                    <Route path= '/applyjob' element= {<JobApplyPage />} /> 
+                    <Route path="/detail-job/:id" element={<DetailedJobPage />} />
+              </Route>
+              <Route element= {<ProtectedRoute role={['admin']} />}>
+                    <Route path="/post-jobs" element={<JobPostPage />} />
+               </Route>
+              <Route path='/unauthorized' element = { <Unauthorized/>} />
          </Route>
+
          <Route element={<RouteWithoutNav/>} >
               <Route path="/login" element={<Login type='SignIn' />} />
               <Route path='/signup' element = { <Login type='SignUp' />} />
               <Route path="*" element= { <NotFound/>} />
 
          </Route>
-        </Routes>
+    </Routes>
   )
 }
 
