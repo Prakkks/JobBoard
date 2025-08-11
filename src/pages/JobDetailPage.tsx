@@ -66,11 +66,11 @@ const JobDetailPage = () => {
     <section className="sections flex flex-col gap-4  ">
         
        
-       <div className="flex flex-row sm:pb-5  p-2 shadow-sm shadow-gray-100   ">
-        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col sm:flex-row items-center justify-around w-full " > 
+       <div className="flex flex-row  sm:pb-5  p-2 shadow-sm shadow-gray-100   ">
+        <form onSubmit={handleSubmit(onSubmit)} className="flex  flex-col gap-2 sm:gap-0 sm:flex-row sm:items-center  justify-around w-full " > 
            
-           <label className="flex flex-col flex-1/4 bg-white "> <p className="text-sm">TYPE</p>  
-           <select {...register('jobType')} className="border-none  bg-[#f6f3f4] w-1/2 rounded-md px-4 py-2  outline-none" >
+           <label className="flex flex-col sm:flex-1/4 bg-white "> <p className="text-sm">TYPE</p>  
+           <select {...register('jobType')} className="border-none  bg-[#f6f3f4] sm:w-1/2 rounded-md px-4 py-2  outline-none" >
                 <option className="" value={''}> Select </option>
                 <option value={'Contract'}> Contract </option>
                 <option value={'Part-time'}> Part Time</option>
@@ -79,10 +79,10 @@ const JobDetailPage = () => {
             </select>
             {errors.jobType && <div>{errors.jobType.message}</div>}
             </label>
-            <label className="flex flex-col flex-1/4 "><p className="text-sm" > CATEGORY</p> <input placeholder="Eg. Kathmandu"  type="text" {...register('location')} className=" border-[#f6f3f4]  bg-[#f6f3f4] w-1/2 rounded-md px-4 py-2 " />
+            <label className="flex flex-col sm:flex-1/4 "><p className="text-sm" > CATEGORY</p> <input placeholder="Eg. Kathmandu"  type="text" {...register('location')} className=" border-[#f6f3f4]  bg-[#f6f3f4] sm:w-1/2 rounded-md px-4 py-2 " />
             {errors.location && <div>{errors.location.message}</div>}
             </label>
-            <span className="flex-1/4  flex-row  justify-center w-full "> <button className=" cursor-pointer  rounded-md w-1/2 justify-center border-2 hover:bg-[#f6f3f4] border-[#f6f3f4] px-4 py-2 flex flex-row gap-2 items-center font-semibold text-black"> <img src="/Icons/search.png" className="w-5 h-5" /> Search</button></span>
+            <span className="sm:flex-1/4  flex-row  justify-center w-full "> <button className=" cursor-pointer  rounded-md sm:w-1/2 justify-center border-2 hover:bg-[#f6f3f4] border-[#f6f3f4] px-4 py-2 flex flex-row gap-2 items-center font-semibold text-black"> <img src="/Icons/search.png" className="w-5 h-5" /> Search</button></span>
  
         </form>
 

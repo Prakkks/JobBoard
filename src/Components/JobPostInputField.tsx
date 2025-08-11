@@ -10,11 +10,12 @@ interface Props{
     placeholder: string,
     name: string,
     type?: "text" | "email" | "password" | "number"| 'radio' | 'option' | 'date',
+  
    
 }
 
 
-const FormComponentPost = ({title,errors,register,subtitle,placeholder,name,type = "number"}:Props) => {
+const JobPostInputField = ({title,errors,register,subtitle,placeholder,name,type = "text"}:Props) => {
   return (
     
               <div className="flex sm:flex-row flex-col p-2 sm:px-5 py-2  border-b-gray-200 border-b-2">
@@ -41,4 +42,4 @@ const FormComponentPost = ({title,errors,register,subtitle,placeholder,name,type
   )
 }
 
-export default FormComponentPost
+export default JobPostInputField

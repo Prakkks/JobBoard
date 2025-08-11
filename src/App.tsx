@@ -1,6 +1,6 @@
 import Login from './pages/Login.tsx';
 import HomePage from './pages/HomePage.tsx';
-import JobApplyPage from './pages/Dashboard.tsx';
+import JobApplyPage from './pages/Dashboarddd.tsx';
 import JobDetailPage from './pages/JobDetailPage.tsx';
 import DetailedJobPage from './pages/DetailedJobPage.tsx';
 import JobPostPage from './pages/JobPostPage.tsx';
@@ -10,7 +10,7 @@ import { Route, Routes } from 'react-router-dom';
 import RouteWithoutNav from './Routes/RouteWithoutNav.tsx';
 import ProtectedRoute from './Routes/ProtectedRoute.tsx';
 import Unauthorized from './pages/Unauthorized.tsx';
-import Dashboard from './pages/Dashboard.tsx';
+import Dashboard from './pages/Dashboarddd.tsx';
 
 const App = () => {
  

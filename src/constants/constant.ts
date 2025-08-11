@@ -28,5 +28,6 @@ export interface JobListValues
     'salary' : number,
     'jobType' : string,
     'createdAt' : string,
+    'time' : string,
     "__v" : number,
 }

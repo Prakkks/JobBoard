@@ -12,7 +12,10 @@
   "dependencies": {
     "@hookform/resolvers": "^5.2.1",
     "@tailwindcss/vite": "^4.1.11",
+    "@tanstack/react-table": "^8.21.3",
     "axios": "^1.11.0",
+    "datetime": "^0.0.3",
+    "framer-motion": "^12.23.12",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-hook-form": "^7.62.0",

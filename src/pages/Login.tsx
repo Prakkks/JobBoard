@@ -1,6 +1,6 @@
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { ConstantValue } from "../constants/constant";
-import { useContext, useState } from "react";
+import { useContext,  useState } from "react";
 import Notification from "../Components/Notification";
 import axios from "axios";
 import { MyContext } from "../ContextProvider/Provider";
@@ -9,11 +9,9 @@ interface Props {
   type: "SignIn" | "SignUp";
 }
 
-
-
-
 const Login = ({ type }: Props) => {
 const apiUrl = import.meta.env.VITE_BASE_URL;  
+
 
 const navigate = useNavigate();
 const context = useContext(MyContext);
@@ -22,7 +20,7 @@ const context = useContext(MyContext);
   {
     throw Error('error');
   }
-  const {setUser ,setShowUserTitle} = context;
+  const {setUser ,setShowUserTitle, user} = context;
   const [content, setContent ] = useState ("");
   const [showNotification , setShowNotification] = useState(false);
   const [selectedrole, setSelectedRole] = useState<'admin'|'user'|'' >("");
@@ -135,6 +133,9 @@ const context = useContext(MyContext);
     const {name,value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   }
+  console.log('user = ',user?.role);
+  if (user?.role)
+  return <Navigate to="/dashboard" />;
 
   return (
     <section className="h-[100vh] p-5 flex flex-col gap-10 bg-[#f3f2f1] justify-center items-center  ">
@@ -209,7 +210,7 @@ const context = useContext(MyContext);
             onChange={handleRadioChange}
 
           />
-           Admin
+           Company
           </label>
            <label className=" flex flex-row gap-2">
            

@@ -1,9 +1,9 @@
 import { useForm } from "react-hook-form"
 import { jobschema, type JobSchemaType } from "../Validation/validate";
 import { zodResolver } from "@hookform/resolvers/zod";
-import FormComponentPost from "../Components/FormComponentPost";
 import axios from "axios";
 import { useState } from "react";
+import JobPostInputField from "../Components/JobPostInputField";
 
 // const JobPostPage = () => {
 //   const {register , handleSubmit , reset , formState: {errors,  isSubmitting,} } = useForm<JobSchemaType>({ resolver: zodResolver(jobschema) });
@@ -16,7 +16,7 @@ import { useState } from "react";
 //     <div className=" text-black ">
 //       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2" >
 //           <label > Job Title</label>
-//           <input type="text" {...register("title")}   />
+//           <input  {...register("title")}   />
 //           {errors.title && <p className="text-red-400">{errors.title.message?.toString()}</p>}
 
 //           <label> Job Description </label>
@@ -41,7 +41,7 @@ const JobPostPage = () => {
     {
     const token = JSON.parse(tokens)
     console.log(data);
-    axios.post('https://jg4npv8c-4000.inc1.devtunnels.ms/api/job/createjob',data, {headers: { 'Authorization': `Bearer ${token}` }})
+    axios.post('https://jg4npv8c-4001.inc1.devtunnels.ms/api/job/create',data, {headers: { 'Authorization': `Bearer ${token}` }})
     .then((response)=>{console.log(response?.data?.message);})
     .catch((error)=>{console.log(error.response?.data?.message);});
     setIsSubmitting(false);
@@ -63,13 +63,14 @@ const JobPostPage = () => {
           </h1>
           
           <form className="flex flex-col gap-3 sm:gap-8 p-3 w-full  " onSubmit={handleSubmit(onSubmit)} >    
-          <FormComponentPost title='Job Title' type="text" name="title"  errors={errors.title} register={register} subtitle="A job title must describe one position only"  placeholder= 'Eg. FrontEnd Developer' />
-          <FormComponentPost title='Job Description' type="text"  name="description"  errors={errors.description} register={register} subtitle="Summarize the key responsibilities of the role"  placeholder= 'Eg. Design & manage UI' />
-          <FormComponentPost title='Employment Type'  name="jobType" type="option" errors={errors.jobType} register={register} subtitle="Choose method of working "  placeholder= 'Eg. 2500' />
-          <FormComponentPost title='Company Name' type="text" name="company" errors={errors.company} register={register} subtitle="Enter the official company or organization name"  placeholder= 'Eg. AECC Global' />
-          <FormComponentPost title='Job Location' type="text"  name="location"  errors={errors.location} register={register} subtitle="Mention the workplace location"  placeholder= 'Eg. Kathmandu' />
-          <FormComponentPost title='Salary Offered'  name="salary" errors={errors.salary} register={register} subtitle="Monthly salary offered for employers"  placeholder= 'Eg. 2500' />
-          <FormComponentPost title='Expiry Date'  type="date" name="time" errors={errors.time} register={register} subtitle="Enter time"  placeholder= ' ' />
+          <JobPostInputField title='Job Title'  name="title"  errors={errors.title} register={register} subtitle="A job title must describe one position only"  placeholder= 'Eg. FrontEnd Developer' />
+          <JobPostInputField title='Job Description'   name="description"  errors={errors.description} register={register} subtitle="Summarize the key responsibilities of the role"  placeholder= 'Eg. Design & manage UI' />
+          <JobPostInputField title='Employment Type'  name="jobType" type="option" errors={errors.jobType} register={register} subtitle="Choose method of working "  placeholder= 'Eg. 2500' />
+          <JobPostInputField title='No. of Opening' type="number"  name="opennings" errors={errors.opennings} register={register} subtitle="Please specify no of employee you want to hire"  placeholder= 'Eg. 5' />
+          <JobPostInputField title='Company Name'  name="company" errors={errors.company} register={register} subtitle="Enter the official company or organization name"  placeholder= 'Eg. AECC Global' />
+          <JobPostInputField title='Job Location'   name="location"  errors={errors.location} register={register} subtitle="Mention the workplace location"  placeholder= 'Eg. Kathmandu' />
+          <JobPostInputField title='Salary Offered' type="number"  name="salary" errors={errors.salary} register={register} subtitle="Monthly salary offered for employers"  placeholder= 'Eg. 2500' />
+          <JobPostInputField title='Expiry Date'  type="date" name="time" errors={errors.time} register={register} subtitle="Enter time"  placeholder= ' ' />
 
                 {/* remaining job type part type full type  */}
           <button type='submit' className="border-2 p-2 w-full self-center rounded-md hover:bg-gray-700 bg-gray-800 text-white"  > {issubmitting ? 'Submitting...' : 'Submit'}</button>

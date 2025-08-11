@@ -5,16 +5,15 @@ import type { JobListValues } from "../constants/constant";
 
 const DetailedJobPage = () => {
   const { id } = useParams();
-  
+
   const [job, setJob] = useState<JobListValues | null>(null);
   const [Apply, setApply] = useState(false);
   const [loading, setLoading] = useState(false);
   const baseurl = import.meta.env.VITE_BASE_URL;
 
   useEffect(() => {
-
     axios
-      .get(`https://jg4npv8c-4000.inc1.devtunnels.ms/api/job/getJob/${id}`)
+      .get(`${baseurl}/api/job/getJob/${id}`)
       .then((response) => {
         console.log(response.data.job);
         setJob(response.data.job);
@@ -26,17 +25,17 @@ const DetailedJobPage = () => {
 
   // ------------------------------------------------------
   const title: string = job?.title || "";
-  const name: string = localStorage.getItem('name')  || '' ;
-  const email: string = localStorage.getItem('email') || '';
-  
+  const name: string = localStorage.getItem("name") || "";
+  const email: string = localStorage.getItem("email") || "";
+
   const [formData, setFormData] = useState<{
-    email: string | '';
-    name: string | '';
-    phonenumber: number|'';
+    email: string | "";
+    name: string | "";
+    phonenumber: number | "";
   }>({
     email: email,
     name: name,
-    phonenumber: '',
+    phonenumber: "",
   });
   const [selectedfile, setSelectedFile] = useState<File | null>(null);
 
@@ -65,35 +64,37 @@ const DetailedJobPage = () => {
       const formValues = new FormData();
 
       formValues.append("cv", selectedfile);
-      formValues.append('phoneNumber', String(formData.phonenumber));
+      formValues.append("phoneNumber", String(formData.phonenumber));
 
       const tokens = localStorage.getItem("token");
-      console.log(formValues.get('cv'));
-     
+      console.log(formValues.get("cv"));
+
       if (tokens) {
         const token = JSON.parse(tokens);
-        console.log(baseurl + "/api/application/apply/" + id); 
-      axios
-        .post(baseurl + "/api/application/apply/" + id, formValues, {
-          headers: {'Authorization': `Bearer ${token}`, "enctype": "multipart/form-data" },
-        })
-        .then((response) => {
-          console.log("response= ", response);
-          // add notification like your job post is done 
-          setLoading(false);
-          setApply(false);
-          setSelectedFile(null);
-          alert("Application submitted");
-        })
-        .catch((error) => {
-          setLoading(false);
-          const er = error.response?.data?.message || "error!!!";
-          console.log("error= ", er);
-        });
+        console.log(baseurl + "/api/application/apply/" + id);
+        axios
+          .post(baseurl + "/api/application/apply/" + id, formValues, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              enctype: "multipart/form-data",
+            },
+          })
+          .then((response) => {
+            console.log("response= ", response);
+            // add notification like your job post is done
+            setLoading(false);
+            setApply(false);
+            setSelectedFile(null);
+            alert("Application submitted");
+          })
+          .catch((error) => {
+            setLoading(false);
+            const er = error.response?.data?.message || "error!!!";
+            console.log("error= ", er);
+          });
       }
-      setFormData({email: '',name: '',phonenumber: ''});
+      setFormData({ email: "", name: "", phonenumber: "" });
       setLoading(false);
-      
     }
   };
 
@@ -119,7 +120,6 @@ const DetailedJobPage = () => {
         </div>
 
         {/* serarch job filter based on  location  */}
-        
 
         {/* body */}
         <div className="flex flex-col rounded-md shadow-md p-3 gap-3 sm:p-5 drop-shadow-gray-300">
@@ -219,7 +219,7 @@ const DetailedJobPage = () => {
               />
               <label className=" form-label"> Phone Number*</label>
               <input
-                type='number'
+                type="number"
                 required
                 name="phonenumber"
                 className="input-box"
