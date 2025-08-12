@@ -1,8 +1,6 @@
 import { Link, Navigate, useNavigate } from "react-router-dom";
-import { ConstantValue } from "../constants/constant";
+import { APICALLHANDLER, ConstantValue } from "../constants/constant";
 import { useContext,  useState } from "react";
-import Notification from "../Components/Notification";
-import axios from "axios";
 import { MyContext } from "../ContextProvider/Provider";
 
 interface Props {
@@ -10,7 +8,7 @@ interface Props {
 }
 
 const Login = ({ type }: Props) => {
-const apiUrl = import.meta.env.VITE_BASE_URL;  
+
 
 
 const navigate = useNavigate();
@@ -21,8 +19,6 @@ const context = useContext(MyContext);
     throw Error('error');
   }
   const {setUser ,setShowUserTitle, user} = context;
-  const [content, setContent ] = useState ("");
-  const [showNotification , setShowNotification] = useState(false);
   const [selectedrole, setSelectedRole] = useState<'admin'|'user'|'' >("");
   const [formData, setFormData] = useState({
     email: "",
@@ -31,15 +27,7 @@ const context = useContext(MyContext);
 
   });
 
-  function servenotification() {
-  setShowNotification(true);
-       setTimeout(() => {
-        setShowNotification(false);
-      },2000);
-
-    setLoading(false);
-}
-
+ 
   const handleClick = () => {
     if (type == "SignIn") {
       navigate("/signup");
@@ -60,40 +48,31 @@ const context = useContext(MyContext);
 
     if (type === 'SignUp') {
         data = { ...data , name: formData.name , role: selectedrole  }
-        console.log('data =',data );
-        try {
-          const url = `${apiUrl}/api/auth/register`;
-          console.log(url)
-          const response = await axios.post(apiUrl+'/api/auth/register', data, {timeout:30000});
-          setContent( ` Hurray! ${response['data']['message']}`);
-          navigate('/login')
-          
-        }
-        catch(e:any)
-        {
-          const errorMessage = e.response?.data?.message || 'Error!';
-          console.log('Error =',errorMessage );
-          setContent(errorMessage);
-        }
+         
+           const response = await APICALLHANDLER({method:'post' , data: data , url: 'https://jg4npv8c-4001.inc1.devtunnels.ms/api/auth/register' });  
+           console.log(response);
+           if (response != null)    
+           navigate('/login');  
       }   
 
       if (type == 'SignIn')
       {
         try {
-          const response = await axios.post(apiUrl+'/api/auth/login', data, {timeout: 30000});
-          console.log(response.data);
-          setContent(response['data']['message']);
-          const role = response.data.user.role;
-          console.log(role);
-          const tokens = JSON.stringify(response['data']['token']);
+          // const response = await axios.post(apiUrl+'/api/auth/login', data, {timeout: 30000});\
+
+          const response = await APICALLHANDLER({method: 'post' , data: data , url: 'https://jg4npv8c-4001.inc1.devtunnels.ms/api/auth/login' });
+
+          console.log("data" , response.data);
+          // console.log('Hello = ', response.data.data);
+          const role = response.data.role;
+          const tokens = JSON.stringify(response.data['token']);
           localStorage.setItem('token', tokens);
-          localStorage.setItem('role',response.data.user.role);
-          localStorage.setItem('name',response.data.user.name);
-          localStorage.setItem('email',response.data.user.email);
-          setUser({'name':response.data.user.name, 'email': response.data.user.email, 'role':response.data.user.role});
+          localStorage.setItem('role',response.data.role);
+          localStorage.setItem('name',response.data.name);
+          localStorage.setItem('email',response.data.email);
+          setUser({'name':response.data.name, 'email': response.data.email, 'role':response.data.role});
           setShowUserTitle(true);
           
-          // axios.defaults.headers.common['Authorization'] = `Bearer ${response['data']['token']}`;
          if (role == 'admin')
           {
             navigate('/');
@@ -104,10 +83,7 @@ const context = useContext(MyContext);
         }
         catch(e:any)
         {
-           
-          const errorMessage = e.response?.data?.message || 'Error!';
-          console.log('Error = ', errorMessage);  
-          setContent(errorMessage);
+         
         }
       }
     
@@ -119,7 +95,7 @@ const context = useContext(MyContext);
     name: "",
   } );
     
-     servenotification();
+     
     setLoading(false);
    
   }
@@ -141,11 +117,7 @@ const context = useContext(MyContext);
     <section className="h-[100vh] p-5 flex flex-col gap-10 bg-[#f3f2f1] justify-center items-center  ">
 
       
-      {showNotification && (
-        <Notification
-         content={content}
-        />
-      )}
+    
 
      <div className='flex flex-col justify-center items-center gap-2'>
       <Link to={'/'} className="font-bold text-xl sm:text-3xl hover:text-blue-600">{ConstantValue.title} </Link >

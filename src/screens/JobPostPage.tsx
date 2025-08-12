@@ -4,50 +4,28 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import { useState } from "react";
 import JobPostInputField from "../Components/JobPostInputField";
+import { toast } from "react-toastify";
 
-// const JobPostPage = () => {
-//   const {register , handleSubmit , reset , formState: {errors,  isSubmitting,} } = useForm<JobSchemaType>({ resolver: zodResolver(jobschema) });
-//   const onSubmit = async (data: JobSchemaType) => {
-//       console.log(data);
-//       await new Promise((resolve) => setTimeout(resolve, 2000));
-//       reset();
-//   }
-//   return (
-//     <div className=" text-black ">
-//       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2" >
-//           <label > Job Title</label>
-//           <input  {...register("title")}   />
-//           {errors.title && <p className="text-red-400">{errors.title.message?.toString()}</p>}
-
-//           <label> Job Description </label>
-//           <input type="text" {...register('description')} />
-//           {errors.description && <p className="text-red-400">{errors.description.message?.toString()}</p>}
-//           <button type="submit" className="bg-blue-500 text-white px-4 py-2">
-//           {isSubmitting ? 'Submitting...' : 'Submit'}
-//           </button>
-//       </form>
-//     </div>
-//   )
-// }
 
 const JobPostPage = () => {
   const [issubmitting, setIsSubmitting] = useState(false);
+  
   const { register, formState: {errors,  } , reset, handleSubmit  } = useForm({ resolver: zodResolver(jobschema) });
  
   const onSubmit = async(data: JobSchemaType) => {
-      setIsSubmitting(true);
+    setIsSubmitting(true);
     const tokens = localStorage.getItem('token');
     if (tokens)
     {
     const token = JSON.parse(tokens)
     console.log(data);
     axios.post('https://jg4npv8c-4001.inc1.devtunnels.ms/api/job/create',data, {headers: { 'Authorization': `Bearer ${token}` }})
-    .then((response)=>{console.log(response?.data?.message);})
-    .catch((error)=>{console.log(error.response?.data?.message);});
+    .then((response)=>{toast.success(response?.data?.message);})
+    .catch((error)=>{toast.error(error.response?.data?.message);});
     setIsSubmitting(false);
     }
     else {
-      alert(' Please refresh and try again. ');
+      toast.info(' Please refresh and try again. ');
       setIsSubmitting(false);
     }
     

@@ -1,20 +1,23 @@
-import Login from './pages/Login.tsx';
-import HomePage from './pages/HomePage.tsx';
-import JobApplyPage from './pages/Dashboarddd.tsx';
-import JobDetailPage from './pages/JobDetailPage.tsx';
-import DetailedJobPage from './pages/DetailedJobPage.tsx';
-import JobPostPage from './pages/JobPostPage.tsx';
-import NotFound from './pages/NotFound.tsx';
+import Login from './screens/Login.tsx';
+import HomePage from './screens/HomePage.tsx';
+import JobApplyPage from './screens/Dashboarddd.tsx';
+import JobDetailPage from './screens/JobDetailPage.tsx';
+import DetailedJobPage from './screens/DetailedJobPage.tsx';
+import JobPostPage from './screens/JobPostPage.tsx';
+import NotFound from './screens/NotFound.tsx';
 import RouteWithNav from './Routes/RouteWithNav.tsx';
 import { Route, Routes } from 'react-router-dom';
 import RouteWithoutNav from './Routes/RouteWithoutNav.tsx';
 import ProtectedRoute from './Routes/ProtectedRoute.tsx';
-import Unauthorized from './pages/Unauthorized.tsx';
-import Dashboard from './pages/Dashboarddd.tsx';
+import Unauthorized from './screens/Unauthorized.tsx';
+import Dashboard from './screens/Dashboarddd.tsx';
+import { ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 const App = () => {
  
   return (
+      <>
    <Routes>
          
          <Route element={<RouteWithNav/> }>
@@ -41,6 +44,8 @@ const App = () => {
 
          </Route>
     </Routes>
+    < ToastContainer  />
+      </>
   )
 }
 

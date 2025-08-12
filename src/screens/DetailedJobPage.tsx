@@ -1,102 +1,56 @@
-import axios from "axios";
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState} from "react";
 import { Link, useParams } from "react-router-dom";
-import type { JobListValues } from "../constants/constant";
+import { APICALLHANDLER, type JobListValues } from "../constants/constant";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { IndividualJobApplySchema, type IndividualJobApplySchemaType } from "../Validation/validate";
 
 const DetailedJobPage = () => {
   const { id } = useParams();
-
   const [job, setJob] = useState<JobListValues | null>(null);
+  const [PreviewFile , setPreviewFile ] = useState(false);
   const [Apply, setApply] = useState(false);
-  const [loading, setLoading] = useState(false);
   const baseurl = import.meta.env.VITE_BASE_URL;
 
+
+  const { register ,  formState: { errors ,isSubmitting }, handleSubmit , setValue  } = useForm({ resolver : zodResolver(IndividualJobApplySchema)} );
+
+  // Required for react-pdf worker
   useEffect(() => {
-    axios
-      .get(`${baseurl}/api/job/getJob/${id}`)
-      .then((response) => {
-        console.log(response.data.job);
-        setJob(response.data.job);
-      })
-      .catch((error: any) => {
-        console.log(error);
+  
+      const responses = APICALLHANDLER({url: `${baseurl}/api/job/getJob/${id}`, method:'get' })
+      responses.then((response)=> {
+        setJob(response?.job);
       });
   }, []);
+
+ 
 
   // ------------------------------------------------------
   const title: string = job?.title || "";
   const name: string = localStorage.getItem("name") || "";
   const email: string = localStorage.getItem("email") || "";
 
-  const [formData, setFormData] = useState<{
-    email: string | "";
-    name: string | "";
-    phonenumber: number | "";
-  }>({
-    email: email,
-    name: name,
-    phonenumber: "",
-  });
+ 
   const [selectedfile, setSelectedFile] = useState<File | null>(null);
 
-  const handleFormValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    e.preventDefault();
-    const { name, value } = e.target;
-    setFormData((prev: any) => ({ ...prev, [name]: value }));
-    console.log(formData);
+  const onsubmit = (data: IndividualJobApplySchemaType)=> {
+    const formData = new FormData();
+    formData.append('file', data.cv[0] );
+    console.log("Data = ",data);
+
   };
+
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setSelectedFile(file);
+    const fileList = e.target.files;
+    if (fileList  && fileList.length > 0) {
+      setSelectedFile(fileList[0]);
+      setValue('cv', fileList, { shouldValidate: true });
+     
     }
   };
 
-  const handleAPplyJobSubmit = (e: FormEvent) => {
-    e.preventDefault();
-
-    if (!selectedfile) {
-      alert("Please select a file");
-    } else {
-      setLoading(true);
-      console.log("Submit clicked");
-      const formValues = new FormData();
-
-      formValues.append("cv", selectedfile);
-      formValues.append("phoneNumber", String(formData.phonenumber));
-
-      const tokens = localStorage.getItem("token");
-      console.log(formValues.get("cv"));
-
-      if (tokens) {
-        const token = JSON.parse(tokens);
-        console.log(baseurl + "/api/application/apply/" + id);
-        axios
-          .post(baseurl + "/api/application/apply/" + id, formValues, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              enctype: "multipart/form-data",
-            },
-          })
-          .then((response) => {
-            console.log("response= ", response);
-            // add notification like your job post is done
-            setLoading(false);
-            setApply(false);
-            setSelectedFile(null);
-            alert("Application submitted");
-          })
-          .catch((error) => {
-            setLoading(false);
-            const er = error.response?.data?.message || "error!!!";
-            console.log("error= ", er);
-          });
-      }
-      setFormData({ email: "", name: "", phonenumber: "" });
-      setLoading(false);
-    }
-  };
 
   return (
     <div className="relative" key={id}>
@@ -196,6 +150,76 @@ const DetailedJobPage = () => {
           </div>
 
           <div>
+            <form encType="multipart/form-data" className="flex flex-col gap-2" onSubmit={handleSubmit(onsubmit)}>
+              <label className=" form-label"> Name*</label>
+             <input type="text" {...register('name')} className={`rounded-md border-2 border-gray-300 px-4 py-2 w-full ${errors.name ? 'border-red-600' : ''} `} />
+              {errors.name && <p className="text-red-600">{errors.name.message}</p>}
+              <label className=" form-label"> Email*</label>
+              <input type="text" {...register('email')}  className={`rounded-md border-2 border-gray-300 px-4 py-2 w-full ${errors.email ? 'border-red-600' : ''} `}  />
+              {errors.email && <p className="text-red-600">{errors.email.message}</p>}
+             
+              <label className=" form-label"> Phone Number*</label>
+              <input type="number" {...register('phone' , {valueAsNumber : true}) } className={`rounded-md border-2 border-gray-300 px-4 py-2 w-full ${errors.phone ? 'border-red-600' : ''} `} />
+              {errors.phone && <p className="text-red-600">{errors.phone.message}</p>}
+
+              <label className="form-label"> Upload your CV here* </label>
+              <input type='file' id="resumeUpload"  accept=".pdf , .docx" className='hidden'  {...register('cv')}  />
+              {errors.cv && <p className="text-red-600">{errors.cv.message as string}</p>}
+             
+              <label
+                htmlFor="resumeUpload"
+                className="px-6 py-3 bg-blue-400 self-start text-black rounded-xl shadow-md cursor-pointer hover:bg-blue-500 hover:text-white transition duration-300 ease-in-out"
+            >
+                📄 Choose Resume
+              </label>
+              {selectedfile && (
+                <div className="flex flex-row items-end gap-2 ">
+                  <p className="text-sm text-gray-700">
+                    Selected File:{" "}
+                    <span className="font-medium p-1 rounded-xl flex flex-row w-fit gap-1 bg-gray-300">
+                      {selectedfile.name}
+                      <img
+                        onClick={() => setSelectedFile(null)}
+                        className="h-3 w-3"
+                        src="/Icons/close.png"
+                      />
+                    </span>
+                  </p>
+                  <div onClick={()=> {setPreviewFile(true)}} className=" cursor-pointer p-1 underline text-sm hover:text-blue-600 "> Preview file  </div>
+                </div>
+              )}
+
+              
+
+              <button
+                type="submit"
+                className=" cursor-pointer hover:bg-gray-700  mt-2 rounded-md w-full text-center p-2 bg-gray-800 text-white "
+              >
+                {isSubmitting ? "Applying ..." : "Apply Now"}
+              </button>
+            </form>
+          </div>
+        </section>
+      )}
+
+     
+
+
+         {/* (
+        <section className="sections sm:top-1/2 sm:left-1/2 sm:transform sm:-translate-x-1/2 sm:-translate-y-1/3 w-full relative  sm:absolute sm:w-2/3 md:w-1/2 bg-[#FAF9FB] gap-5 flex flex-col rounded-4xl p-1  shadow-xl shadow-gray-300 ">
+          <div className="container border-b-2 border-b-black/10 flex flex-row items-center justify-between pb-3  w-full">
+            <h1 className=" md:text-xl font-semibold"> Apply for {title}</h1>
+            <button
+              className="cursor-pointer"
+              onClick={() => {
+                setApply(false);
+              }}
+            >
+              <img src="/Icons/close.png" />{" "}
+            </button>
+          </div>
+
+          <div>
             <form encType="multipart/form-data" className="flex flex-col gap-2">
               <label className=" form-label"> Name*</label>
               <input
@@ -245,7 +269,7 @@ const DetailedJobPage = () => {
                 📄 Choose Resume
               </label>
               {selectedfile && (
-                <div>
+                <div className="flex flex-row items-end gap-2 ">
                   <p className="text-sm text-gray-700">
                     Selected File:{" "}
                     <span className="font-medium p-1 rounded-xl flex flex-row w-fit gap-1 bg-gray-300">
@@ -257,6 +281,7 @@ const DetailedJobPage = () => {
                       />
                     </span>
                   </p>
+                  <div onClick={()=> {setPreviewFile(true)}} className=" cursor-pointer p-1 underline text-sm hover:text-blue-600 ">Preview file  </div>
                 </div>
               )}
 
@@ -270,7 +295,8 @@ const DetailedJobPage = () => {
             </form>
           </div>
         </section>
-      )}
+      ) */}
+    
     </div>
   );
 };

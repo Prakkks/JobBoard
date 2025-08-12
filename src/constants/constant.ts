@@ -1,3 +1,6 @@
+import axios from "axios";
+import { toast } from "react-toastify";
+
 export const  ConstantValue: ConstantValueProps=
 {
  title: 'JobBoard',
@@ -30,4 +33,42 @@ export interface JobListValues
     'createdAt' : string,
     'time' : string,
     "__v" : number,
+}
+
+
+type apiCallProps = {
+    method: 'get' | 'post' | 'put' | 'delete',
+    url: string,
+    data?: any,
+    header?:any,
+    params?:any
+}
+
+
+export async function APICALLHANDLER ({method ,data ,header , url, params}: apiCallProps) 
+{
+    
+    try {
+        const response =  (method == 'get' || method == 'delete') ?    
+        await axios[method](url , {params ,headers: header, timeout:30000 })
+        : 
+        await axios[method](url ,data, {params ,headers: header, timeout:30000 });
+        
+        toast.success(response.data.message);
+        // console.log('from here =', response.data);
+        return response.data;
+
+       }
+    catch (error:any) {
+         toast.error(error.response?.data?.message || 'Something went wrong');
+         return null;
+       }
+
+    
+
+
+
+
+
+
 }

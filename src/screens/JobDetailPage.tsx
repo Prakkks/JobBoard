@@ -1,6 +1,5 @@
-import axios from "axios";
 import { useEffect, useState } from "react"
-import type { JobListValues } from "../constants/constant";
+import { APICALLHANDLER, type JobListValues } from "../constants/constant";
 import ListedJobCard from "../Components/ListedJobCard";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form"
@@ -26,32 +25,26 @@ const JobDetailPage = () => {
 
     ()=> {
 
-      let url = baseURL+'/api/job/getAllJobs';
+      // let url = baseURL+'/api/job/getAllJobs';
       
-      if (reloadJobShow.jobType !== '' && reloadJobShow.location !== '') {
-        url += `?jobType=${reloadJobShow.jobType}&location=${reloadJobShow.location}`; 
-      }
-      else if (reloadJobShow.jobType !== '' ){
-        url += `?jobType=${reloadJobShow.jobType}`;
-      }
-      else if (reloadJobShow.location !== ''){
-        url += `?location=${reloadJobShow.location}`;
-      }
-      console.log('url = ', url);
-      axios.get(url)
-      .then((response)=> {
-          setJob(response.data.jobs);
-          const arr = response.data.jobs;
-         setJob(arr);
-          
-          
-      })
-      .catch((error)=> {
-        console.log('error:',error);
-      })
-     
+      // console.log('url = ', url);
+      // axios.get(url, {params: {jobType : reloadJobShow.jobType , location : reloadJobShow.location}})
+      // .then((response)=> {
+      //     setJob(response.data.jobs);
+      //     const arr = response.data.jobs;
+      //    setJob(arr);
+            
+      // })
+      // .catch((error)=> {
+      //   console.log('error:',error);
+      // })
 
-      
+      const responses = APICALLHANDLER({method:'get', params: {jobType : reloadJobShow.jobType , location : reloadJobShow.location}, url:'https://jg4npv8c-4001.inc1.devtunnels.ms/api/job/getAllJobs'} );
+      responses.then((response)=> {
+          // console.log(response?.jobs);
+          setJob(response?.jobs);        
+      });
+
      
     },
     [reloadJobShow]);
@@ -104,8 +97,6 @@ const JobDetailPage = () => {
             <ListedJobCard key={index} letter = {firstletter} keyed={index} id={job._id} title= {job.title} company={job.company} salary={job.salary} location={job.location} jobType={job.jobType} createdAt={dates} />
 
           )
-
-            
           
             })
       )}

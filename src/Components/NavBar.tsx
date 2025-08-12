@@ -3,6 +3,7 @@ import Button from "./Button"
 import { ConstantValue } from "../constants/constant"
 import { useContext,  useState } from "react"
 import { MyContext } from "../ContextProvider/Provider"
+import { toast } from "react-toastify"
 
 
 const NavBar = () => {
@@ -38,6 +39,7 @@ const NavBar = () => {
     setIsClicked(false);
     setUser(null);
     setShowUserTitle(false);
+    toast.success('User Logout Successfully!');
    
   }
   return (
