@@ -49,7 +49,7 @@ const context = useContext(MyContext);
     if (type === 'SignUp') {
         data = { ...data , name: formData.name , role: selectedrole  }
          
-           const response = await APICALLHANDLER({method:'post' , data: data , url: 'https://jg4npv8c-4001.inc1.devtunnels.ms/api/auth/register' });  
+           const response = await APICALLHANDLER({method:'post' , data: data , url: '/api/auth/register' , token: false });  
            console.log(response);
            if (response != null)    
            navigate('/login');  
@@ -58,12 +58,11 @@ const context = useContext(MyContext);
       if (type == 'SignIn')
       {
         try {
-          // const response = await axios.post(apiUrl+'/api/auth/login', data, {timeout: 30000});\
+         
 
-          const response = await APICALLHANDLER({method: 'post' , data: data , url: 'https://jg4npv8c-4001.inc1.devtunnels.ms/api/auth/login' });
+          const response = await APICALLHANDLER({method: 'post' , data: data , url: '/api/auth/login' , token: false });
 
           console.log("data" , response.data);
-          // console.log('Hello = ', response.data.data);
           const role = response.data.role;
           const tokens = JSON.stringify(response.data['token']);
           localStorage.setItem('token', tokens);

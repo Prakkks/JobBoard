@@ -12,13 +12,15 @@ import { JobFilterSchema, type JobFilterSchemaType } from "../Validation/validat
 const JobDetailPage = () => {
   
   const [job, setJob] = useState<JobListValues[]>([]);
+  const [searching, isSearching] = useState(false);
   const [reloadJobShow , setReloadJobShow] = useState<JobFilterSchemaType>({'jobType':'' ,'location':'' });
-  const baseURL = import.meta.env.VITE_BASE_URL
   
   const {register , formState: {errors}, handleSubmit} = useForm( {resolver: zodResolver(JobFilterSchema)} );
     const onSubmit = (data:JobFilterSchemaType)=> {
+      isSearching(true);
         console.log(data);
         setReloadJobShow(data);
+      
     }
 
   useEffect(
@@ -39,11 +41,12 @@ const JobDetailPage = () => {
       //   console.log('error:',error);
       // })
 
-      const responses = APICALLHANDLER({method:'get', params: {jobType : reloadJobShow.jobType , location : reloadJobShow.location}, url:'https://jg4npv8c-4001.inc1.devtunnels.ms/api/job/getAllJobs'} );
+      const responses = APICALLHANDLER({method:'get', params: {jobType : reloadJobShow.jobType , location : reloadJobShow.location }, url:'/api/job/getAllJobs' , token:false} );
       responses.then((response)=> {
-          // console.log(response?.jobs);
+      
           setJob(response?.jobs);        
       });
+      responses.finally(()=> { isSearching(false)});
 
      
     },
@@ -75,7 +78,7 @@ const JobDetailPage = () => {
             <label className="flex flex-col sm:flex-1/4 "><p className="text-sm" > CATEGORY</p> <input placeholder="Eg. Kathmandu"  type="text" {...register('location')} className=" border-[#f6f3f4]  bg-[#f6f3f4] sm:w-1/2 rounded-md px-4 py-2 " />
             {errors.location && <div>{errors.location.message}</div>}
             </label>
-            <span className="sm:flex-1/4  flex-row  justify-center w-full "> <button className=" cursor-pointer  rounded-md sm:w-1/2 justify-center border-2 hover:bg-[#f6f3f4] border-[#f6f3f4] px-4 py-2 flex flex-row gap-2 items-center font-semibold text-black"> <img src="/Icons/search.png" className="w-5 h-5" /> Search</button></span>
+            <span className="sm:flex-1/4  flex-row  justify-center w-full "> <button    className=" cursor-pointer  rounded-md sm:w-1/2 justify-center border-2 hover:bg-[#f6f3f4] border-[#f6f3f4] px-4 py-2 flex flex-row gap-2 items-center font-semibold text-black"> <img src="/Icons/search.png" className="w-5 h-5" />{ searching ?'Searching' : 'Search'}</button></span>
  
         </form>
 

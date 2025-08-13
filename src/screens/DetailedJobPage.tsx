@@ -6,49 +6,96 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { IndividualJobApplySchema, type IndividualJobApplySchemaType } from "../Validation/validate";
 
 const DetailedJobPage = () => {
+  const name: string = localStorage.getItem("name") || "";
+  const email: string = localStorage.getItem("email") || "";
+
   const { id } = useParams();
   const [job, setJob] = useState<JobListValues | null>(null);
   const [PreviewFile , setPreviewFile ] = useState(false);
   const [Apply, setApply] = useState(false);
-  const baseurl = import.meta.env.VITE_BASE_URL;
 
 
-  const { register ,  formState: { errors ,isSubmitting }, handleSubmit , setValue  } = useForm({ resolver : zodResolver(IndividualJobApplySchema)} );
+  const { register ,  formState: { errors ,isSubmitting }, handleSubmit , setValue ,reset } = useForm({ resolver : zodResolver(IndividualJobApplySchema) , defaultValues : {email: email , name:name}} );
 
-  // Required for react-pdf worker
+ 
   useEffect(() => {
   
-      const responses = APICALLHANDLER({url: `${baseurl}/api/job/getJob/${id}`, method:'get' })
+      const responses = APICALLHANDLER({url: `/api/job/getJob/${id}`, method:'get' })
       responses.then((response)=> {
         setJob(response?.job);
+        reset();
       });
   }, []);
 
  
 
   // ------------------------------------------------------
-  const title: string = job?.title || "";
-  const name: string = localStorage.getItem("name") || "";
-  const email: string = localStorage.getItem("email") || "";
-
+   const title: string = job?.title || "";
+ 
  
   const [selectedfile, setSelectedFile] = useState<File | null>(null);
 
   const onsubmit = (data: IndividualJobApplySchemaType)=> {
     const formData = new FormData();
-    formData.append('file', data.cv[0] );
+    formData.append('cv' , data.cv);
+    formData.append('phoneNumber' , String(data.phone));
+    
+    console.log('Form Data: ', formData.get('cv'));
     console.log("Data = ",data);
+    const tokens = localStorage.getItem('token');
+     if (tokens) {
+        
+          const responses = APICALLHANDLER({url: `/api/application/apply/${id}`, method: 'post' , data: formData});
+          responses.then((response) => {
+            console.log("response= ", response);
+            setApply(false);
+            setSelectedFile(null);
+          })
+          responses.catch((error) => {
+            const er = error.response?.data?.message || "error!!!";
+            console.log("error= ", er);
+          });
+        }
+
 
   };
 
+    // if (tokens) {
+  //       const token = JSON.parse(tokens);
+  //       console.log(baseurl + "/api/application/apply/" + id);
+  //       axios
+  //         .post(baseurl + "/api/application/apply/" + id, formValues, {
+  //           headers: {
+  //             Authorization: `Bearer ${token}`,
+  //             enctype: "multipart/form-data",
+  //           },
+  //         })
+  //         .then((response) => {
+  //           console.log("response= ", response);
+  //           // add notification like your job post is done
+  //           setLoading(false);
+  //           setApply(false);
+  //           setSelectedFile(null);
+  //           alert("Application submitted");
+  //         })
+  //         .catch((error) => {
+  //           setLoading(false);
+  //           const er = error.response?.data?.message || "error!!!";
+  //           console.log("error= ", er);
+  //         });
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const fileList = e.target.files;
-    if (fileList  && fileList.length > 0) {
-      setSelectedFile(fileList[0]);
-      setValue('cv', fileList, { shouldValidate: true });
-     
+    const fileList = e.target.files?.[0] || null ;
+      if (fileList)
+        {setValue('cv', fileList, { shouldValidate: true });
+        setSelectedFile(fileList); 
+      
     }
+    else 
+      {
+        setSelectedFile(null);
+      }   
+  
   };
 
 
@@ -163,7 +210,7 @@ const DetailedJobPage = () => {
               {errors.phone && <p className="text-red-600">{errors.phone.message}</p>}
 
               <label className="form-label"> Upload your CV here* </label>
-              <input type='file' id="resumeUpload"  accept=".pdf , .docx" className='hidden'  {...register('cv')}  />
+              <input type='file' id="resumeUpload"  accept=".pdf , .docx" className='hidden'  {...register('cv')}  onChange={handleFileUpload} />
               {errors.cv && <p className="text-red-600">{errors.cv.message as string}</p>}
              
               <label

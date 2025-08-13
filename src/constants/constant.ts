@@ -1,5 +1,6 @@
 import axios from "axios";
 import { toast } from "react-toastify";
+import { ur } from "zod/v4/locales";
 
 export const  ConstantValue: ConstantValueProps=
 {
@@ -36,26 +37,81 @@ export interface JobListValues
 }
 
 
+export type JobPosted = {
+  _id: string;
+  __v: number;
+  user: string;
+  title: string;
+  salary: number;
+  location: string;
+  jobType: string;
+  description: string;
+  opennings : number;
+  status : number;
+  createdAt: string;
+  company: string;
+  time: string;
+};
+
+
+
+export interface UserAppliedJob {
+ company : string ,
+ jobType : string ,
+ location : string,
+ salary : number,
+ time : string ,
+ title :  string,
+ _id : string ,
+}
+export interface UserDetail {
+  email : string,
+  name : string ,
+  _id : string ,
+}
+
+export type JobApplied = {
+  createdAt : string,
+  cv: string,
+  job : UserAppliedJob[],
+  user : UserDetail[],
+  _v : number,
+  _id : string ,
+};
+
+
+
+
 type apiCallProps = {
     method: 'get' | 'post' | 'put' | 'delete',
     url: string,
     data?: any,
     header?:any,
     params?:any
+    token?: boolean ;
 }
 
 
-export async function APICALLHANDLER ({method ,data ,header , url, params}: apiCallProps) 
+export async function APICALLHANDLER ({method ,data ,header , url, params ,token= true}: apiCallProps) 
 {
-    
+    const base_url = import.meta.env.VITE_BASE_URL;
     try {
+    if (token) {
+      const authToken = localStorage.getItem("token"); 
+
+      if (authToken) {
+        header = {
+          ...header,
+          Authorization: `Bearer ${JSON.parse(authToken)}`,
+        };
+      }
+    }
         const response =  (method == 'get' || method == 'delete') ?    
-        await axios[method](url , {params ,headers: header, timeout:30000 })
+        await axios[method](`${base_url}${url}` , {params ,headers: header, timeout:30000 })
         : 
-        await axios[method](url ,data, {params ,headers: header, timeout:30000 });
+        await axios[method](`${base_url}${url}` ,data, {params ,headers: header, timeout:30000 });
         
         toast.success(response.data.message);
-        // console.log('from here =', response.data);
         return response.data;
 
        }
