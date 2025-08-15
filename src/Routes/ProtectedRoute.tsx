@@ -1,6 +1,4 @@
-import { useContext } from "react"
 import { Navigate, Outlet } from "react-router-dom"
-// import { MyContext } from "../ContextProvider/Provider"
 
 interface AllowedRole {
     role : string[],

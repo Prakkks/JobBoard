@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom"
-import Button from "./Button"
 
 interface Props{
     'id' : string,
@@ -7,7 +6,7 @@ interface Props{
     'createdAt':string,
     'location':string,
     'company':string,
-    'jobType':string,
+    'jobType':number,
     'salary' : number,
     'letter' : string,
     'keyed':number,

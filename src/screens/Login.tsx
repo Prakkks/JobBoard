@@ -19,7 +19,7 @@ const context = useContext(MyContext);
     throw Error('error');
   }
   const {setUser ,setShowUserTitle, user} = context;
-  const [selectedrole, setSelectedRole] = useState<'admin'|'user'|'' >("");
+  const [selectedrole, setSelectedRole] = useState<'admin'|'user'|'reviewer' |'' >("");
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -63,7 +63,7 @@ const context = useContext(MyContext);
           const response = await APICALLHANDLER({method: 'post' , data: data , url: '/api/auth/login' , token: false });
 
           console.log("data" , response.data);
-          const role = response.data.role;
+          // const role = response.data.role;
           const tokens = JSON.stringify(response.data['token']);
           localStorage.setItem('token', tokens);
           localStorage.setItem('role',response.data.role);
@@ -71,13 +71,9 @@ const context = useContext(MyContext);
           localStorage.setItem('email',response.data.email);
           setUser({'name':response.data.name, 'email': response.data.email, 'role':response.data.role});
           setShowUserTitle(true);
-          
-         if (role == 'admin')
-          {
-            navigate('/');
-          }
-          else
-          navigate('/job-detail')
+
+          navigate('/');
+        
           
         }
         catch(e:any)

@@ -13,6 +13,8 @@ import Unauthorized from './screens/Unauthorized.tsx';
 import Dashboard from './screens/Dashboarddd.tsx';
 import { ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
+import ReviwerScreen from './screens/ReviwerScreen.tsx';
+import ViewJob from './Components/ViewJob.tsx';
 
 const App = () => {
  
@@ -23,12 +25,17 @@ const App = () => {
          <Route element={<RouteWithNav/> }>
 
               <Route path="/" element={<HomePage />} />
-              <Route path='/job-detail' element= {<JobDetailPage />} />
+              <Route path='/job-detail' element= {<ViewJob />} />
+              <Route path='/reviewer-screen' element= {<ReviwerScreen />} />
+
+              <Route element= {<ProtectedRoute role={['reviewer']} />}>
+                  <Route path='/reviewer-screen' element= {<ReviwerScreen />} />
+              </Route>
               <Route element= {<ProtectedRoute role={['admin','user']} />}>
                     <Route path="/dashboard" element={<Dashboard/>} />
+                    <Route path= '/applyjob' element= {<JobApplyPage />} /> 
               </Route>
               <Route element= {<ProtectedRoute role={['user']} />}>
-                    <Route path= '/applyjob' element= {<JobApplyPage />} /> 
                     <Route path="/detail-job/:id" element={<DetailedJobPage />} />
               </Route>
               <Route element= {<ProtectedRoute role={['admin']} />}>

@@ -1,6 +1,5 @@
 import axios from "axios";
 import { toast } from "react-toastify";
-import { ur } from "zod/v4/locales";
 
 export const  ConstantValue: ConstantValueProps=
 {
@@ -30,7 +29,7 @@ export interface JobListValues
     'company' : string,
     'location' : string,
     'salary' : number,
-    'jobType' : string,
+    'jobType' : number,
     'createdAt' : string,
     'time' : string,
     "__v" : number,
@@ -44,14 +43,51 @@ export type JobPosted = {
   title: string;
   salary: number;
   location: string;
-  jobType: string;
+  jobType: number;
   description: string;
   opennings : number;
   status : number;
   createdAt: string;
   company: string;
+  updatedAt : string;
   time: string;
 };
+
+export type JobPostType = {
+  _id: string;
+  __v: number;
+  user: string;
+  title: string;
+  salary: number;
+  location: string;
+  jobType: number;
+  description: string;
+  opennings : number;
+  status : number;
+  createdAt: string;
+  company: string;
+  updatedAt : string;
+  time: string;
+};
+
+export type JobPostTypeWColor = {
+  _id: string;
+  __v: number;
+  user: string;
+  title: string;
+  salary: number;
+  location: string;
+  jobType: number;
+  description: string;
+  opennings : number;
+  status : number;
+  createdAt: string;
+  company: string;
+  updatedAt : string;
+  time: string;
+  color : string;
+};
+
 
 
 
@@ -110,7 +146,7 @@ export async function APICALLHANDLER ({method ,data ,header , url, params ,token
         await axios[method](`${base_url}${url}` , {params ,headers: header, timeout:30000 })
         : 
         await axios[method](`${base_url}${url}` ,data, {params ,headers: header, timeout:30000 });
-        
+        if (method !== 'get')
         toast.success(response.data.message);
         return response.data;
 

@@ -48,13 +48,15 @@ const NavBar = () => {
         <Link to={'/'}> <h1 className="font-bold outline-none"> {ConstantValue.title} </h1></Link>
       <ul className=" hidden sm:flex flex-row gap-10 ">
         <Link to={'/'} className={` nav-link ${currentpath =='/'?  'active-link' : '' } `}> Home </Link>
-         {role !='Guest'  
+         {role !='Guest'  && role != 'reviewer'
         &&<Link to={'/dashboard'} className={` nav-link ${currentpath == '/dashboard' ? 'active-link' : '' } `}> Dashboard </Link>
          }
-        {role !='admin'
-         &&<Link to={'/job-detail'} className={` nav-link ${currentpath == '/job-detail' ? 'active-link' : '' } `}> View Jobs </Link>}
+        <Link to={'/job-detail'} className={` nav-link ${currentpath == '/job-detail' ? 'active-link' : '' } `}> View Jobs </Link>
        { role == 'admin'  && 
         <Link to={'/post-jobs'} className={` nav-link ${currentpath == '/post-jobs' ? 'active-link' : '' } `}> Post Jobs </Link>
+       }
+        { role == 'reviewer'  && 
+        <Link  to={'/reviewer-screen'} className={` nav-link ${currentpath == '/reviewer-screen' ? 'active-link' : '' } `}> Reviewer  </Link>
        }
       </ul> 
       <div className="flex flex-row items-center gap-3">
@@ -107,13 +109,15 @@ const NavBar = () => {
         
         <ul className="  sm:hidden  flex flex-col  absolute z-10 w-full ">
         <Link  onClick={handleMenuClick} to={'/'} className={`  nav-link-sm  ${currentpath == '/' ? 'text-green-500' : '' }  ` }> Home </Link>
-         {role !='Guest'  
+         {role !='Guest'  && role!= 'reviewer' 
         &&<Link  onClick={handleMenuClick}  to={'/dashboard'} className={` nav-link-sm ${currentpath == '/dashboard' ? 'text-green-500' : '' } `}> Dashboard </Link>
          }
-        {role !='admin'
-         &&<Link  onClick={handleMenuClick} to={'/job-detail'} className={` nav-link-sm ${currentpath == '/job-detail' ? 'text-green-500' : '' } `}> View Jobs </Link>}
+         <Link  onClick={handleMenuClick} to={'/job-detail'} className={` nav-link-sm ${currentpath == '/job-detail' ? 'text-green-500' : '' } `}> View Jobs </Link>
        { role == 'admin'  && 
         <Link  onClick={handleMenuClick} to={'/post-jobs'} className={` nav-link-sm ${currentpath == '/post-jobs' ? 'text-green-500' : '' } `}> Post Jobs </Link>
+       }
+        { role == 'reviewer'  && 
+        <Link  onClick={handleMenuClick} to={'/reviewer-screen'} className={` nav-link-sm ${currentpath == '/reviewer-screen' ? 'text-green-500' : '' } `}> Reviewer Portal </Link>
        }
         
       </ul> 

@@ -4,6 +4,7 @@ import ListedJobCard from "../Components/ListedJobCard";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form"
 import { JobFilterSchema, type JobFilterSchemaType } from "../Validation/validate";
+import { JOBTYPE } from "../constants/enums";
 
 
 
@@ -27,24 +28,14 @@ const JobDetailPage = () => {
 
     ()=> {
 
-      // let url = baseURL+'/api/job/getAllJobs';
-      
-      // console.log('url = ', url);
-      // axios.get(url, {params: {jobType : reloadJobShow.jobType , location : reloadJobShow.location}})
-      // .then((response)=> {
-      //     setJob(response.data.jobs);
-      //     const arr = response.data.jobs;
-      //    setJob(arr);
-            
-      // })
-      // .catch((error)=> {
-      //   console.log('error:',error);
-      // })
+    
 
       const responses = APICALLHANDLER({method:'get', params: {jobType : reloadJobShow.jobType , location : reloadJobShow.location }, url:'/api/job/getAllJobs' , token:false} );
       responses.then((response)=> {
       
-          setJob(response?.jobs);        
+          setJob(response?.jobs);     
+          console.log(response.jobs);   
+          console.log(job.length);
       });
       responses.finally(()=> { isSearching(false)});
 
@@ -68,10 +59,10 @@ const JobDetailPage = () => {
            <label className="flex flex-col sm:flex-1/4 bg-white "> <p className="text-sm">TYPE</p>  
            <select {...register('jobType')} className="border-none  bg-[#f6f3f4] sm:w-1/2 rounded-md px-4 py-2  outline-none" >
                 <option className="" value={''}> Select </option>
-                <option value={'Contract'}> Contract </option>
-                <option value={'Part-time'}> Part Time</option>
-                <option value={'Full-time'}> Full Time</option>
-                <option value={'Internship'}> Internship</option>
+                <option value={JOBTYPE.Contract }> Contract </option>
+                <option value={JOBTYPE.PartTime}> Part Time</option>
+                <option value={JOBTYPE.FullTime}> Full Time</option>
+                <option value={JOBTYPE.Internship}> Internship</option>
             </select>
             {errors.jobType && <div>{errors.jobType.message}</div>}
             </label>
@@ -88,7 +79,7 @@ const JobDetailPage = () => {
 
        <div  className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-x-4 gap-y-7 justify-evenly w-full">
     
-       {job.length === 0 ? (
+       {job.length == 0 ? (
         <p>No result found..</p>
       ) : (
         
