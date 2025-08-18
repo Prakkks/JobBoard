@@ -201,7 +201,7 @@ import { useEffect, useState } from "react";
 import { APICALLHANDLER, type JobPostType, type JobPostTypeWColor } from "../constants/constant";
 import JobDescriptionProp from "./JobDescriptionProp";
 import { JOBTYPE } from "../constants/enums";
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, MoveLeftIcon } from "lucide-react";
 import { details } from "framer-motion/client";
 
 
@@ -433,7 +433,8 @@ const ViewJob = () => {
 
 
 
-    { viewdetailJob && <div className="min-w-[60%] p-5 mt-20"> 
+    { viewdetailJob && <div className="min-w-[60%] relative  p-5 mt-20">
+      <div className="p-2 shadow-md flex items-center justify-center absolute left-0 top-1/2"> <MoveLeftIcon size={18} /> </div> 
     <div className="flex flex-col rounded-md shadow-md p-3 gap-3 bg-white sm:p-5 drop-shadow-gray-300">
           <div className="flex flex-row items-center">
             <div className="rounded-4xl w-13 h-13 lg:w-20 lg:h-20 sm:w-15 sm:h-15 p-2 items-center font-bold text-3xl justify-center flex bg-gray-200 ">

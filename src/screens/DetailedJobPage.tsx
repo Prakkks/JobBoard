@@ -89,7 +89,7 @@ const DetailedJobPage = () => {
                 setApply(false);
               }}
             >
-              <img src="/Icons/close.png" />{" "}
+              <img src="/Icons/close.png" />
             </button>
           </div>
 

@@ -36,7 +36,7 @@ const HomePage = () => {
             <img src="/public/jobimage.jpg" alt="job_image" className="  md:w-[50%] h-auto" />
             <motion.div  initial={{x:'-100vw'}} animate={{x:0}} transition={{duration:1}}>
            {role == 'admin' &&   <Link className="px-5  py-3  rounded-lg bg-gray-700 text-white  nav-link   " to={'/post-jobs'}> Post Job ➞ </Link>}
-           {role == 'Guest' &&   <Link className="px-5  py-3  rounded-lg bg-gray-700 text-white  nav-link   " to={'/login'}> Get Started ➞ </Link>}
+           {role == 'Guest' || role == "reviewer" &&   <Link className="px-5  py-3  rounded-lg bg-gray-700 text-white  nav-link   " to={'/login'}> Get Started ➞ </Link>}
            {role == 'user' &&   <Link className="px-5  py-3  rounded-lg bg-gray-700 text-white  nav-link   " to={'/job-detail'}>View Jobs ➞ </Link>}
           </motion.div>
           <p> <Link to='/login'   className="underline hover:text-black text-blue font-semibold  " >Post your resume</Link> - It only takes a few seconds </p>

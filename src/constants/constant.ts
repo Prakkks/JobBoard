@@ -152,6 +152,7 @@ export async function APICALLHANDLER ({method ,data ,header , url, params ,token
 
        }
     catch (error:any) {
+      if (method !== 'get')
          toast.error(error.response?.data?.message || 'Something went wrong');
          return null;
        }

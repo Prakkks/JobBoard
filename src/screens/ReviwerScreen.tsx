@@ -407,6 +407,9 @@ const pendingjobTable =  useReactTable(
                 </div>
             ))
         }
+        { approvedjob.length < 1 && 
+        <div className="text-black items-center text-center p-3"> No job Found!! </div>
+        }
         </div>
         
         <div className="rounded-xl bg-white flex-1/2 overflow-y-auto  "> 
@@ -430,6 +433,9 @@ const pendingjobTable =  useReactTable(
                     </div>
                 </div>
             ))
+        }
+          { rejectedjob.length < 1 && 
+        <div className="text-black items-center text-center p-3"> No job Found!! </div>
         }
         </div>
     </div>

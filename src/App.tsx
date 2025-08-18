@@ -27,6 +27,8 @@ const App = () => {
               <Route path="/" element={<HomePage />} />
               <Route path='/job-detail' element= {<ViewJob />} />
               <Route path='/reviewer-screen' element= {<ReviwerScreen />} />
+              <Route path="/detail-job/:id" element={<DetailedJobPage />} />
+
 
               <Route element= {<ProtectedRoute role={['reviewer']} />}>
                   <Route path='/reviewer-screen' element= {<ReviwerScreen />} />
@@ -36,7 +38,7 @@ const App = () => {
                     <Route path= '/applyjob' element= {<JobApplyPage />} /> 
               </Route>
               <Route element= {<ProtectedRoute role={['user']} />}>
-                    <Route path="/detail-job/:id" element={<DetailedJobPage />} />
+                    {/* <Route path="/detail-job/:id" element={<DetailedJobPage />} /> */}
               </Route>
               <Route element= {<ProtectedRoute role={['admin']} />}>
                     <Route path="/post-jobs" element={<JobPostPage />} />
