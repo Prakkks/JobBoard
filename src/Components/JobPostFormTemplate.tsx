@@ -18,7 +18,7 @@ interface Props  {
 const defaultValues:JobSchemaType = {
         title: '',
         description: '',
-        jobType: '',
+        jobType: 0,
         opennings: 0,
         company: '',
         location: '',
@@ -26,7 +26,7 @@ const defaultValues:JobSchemaType = {
         time: '',
       };
 
-const JobPostFormTemplate = ({formHeading , onSubmit , currentIDData , setcurrentIDData, }:Props) => {
+const JobPostFormTemplate = ({formHeading , onSubmit , currentIDData ,  }:Props) => {
       const { register , formState: { errors , isSubmitting } , handleSubmit , reset } = useForm({resolver: zodResolver(jobschema),defaultValues: defaultValues });
       
       const handleonSubmit = async(data:JobSchemaType)=> {
@@ -41,15 +41,15 @@ const JobPostFormTemplate = ({formHeading , onSubmit , currentIDData , setcurren
       reset({
         ...defaultValues,
         ...currentIDData,
-        time: undefined,
-        jobType: undefined,
+        time: currentIDData.time.split('T')[0],
+        
         });
     }
   }, [currentIDData, reset]);
   
 
   return (
-   <div className=" w-full flex flex-col justify-center m-2 border-gray-200 border-2 rounded-md px-4 sm:w-[80%] bg-white flex-1">
+   <div className=" w-full flex flex-col justify-center flex-1/2 m-2 border-gray-200 border-2 rounded-md px-4  bg-white ">
 
           <h1 className=" border-b-2 border-b-gray-200">
             <p className="p-5 font-bold text-xl text-center"> {formHeading}</p>

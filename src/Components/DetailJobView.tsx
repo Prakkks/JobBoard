@@ -1,4 +1,3 @@
-import React from 'react'
 import type { JobPosted } from '../constants/constant'
 import { JOBTYPE } from '../constants/enums'
 

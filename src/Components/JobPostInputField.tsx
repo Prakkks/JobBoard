@@ -26,11 +26,11 @@ const JobPostInputField = ({title,errors,register,subtitle,placeholder,name,type
                 <input className={`rounded-md border-2 border-gray-300 px-4 py-2 w-full ${errors ? 'border-red-600' : ''} `} type={type} placeholder={placeholder} {...register(name, { valueAsNumber: type==='number'  })} />}
                {type == 'option' &&
                <>
-               <select {...register(name)} className={`rounded-md border-2 border-gray-300 px-4 py-2 w-full ${errors ? 'border-red-600' : ''} `}>
-                  <option value="Full-time">Full Time</option>
-                  <option value="Part-time">Part Time</option>
-                  <option value="Contract">Contract</option>
-                  <option value="Internship">Internship</option>
+               <select {...register(name, {valueAsNumber: true})} className={`rounded-md border-2 border-gray-300 px-4 py-2 w-full ${errors ? 'border-red-600' : ''} `}>
+                  <option value={1}>Full Time</option>
+                  <option value={2}>Part Time</option>
+                  <option value={3}>Contract</option>
+                  <option value={4}>Internship</option>
                 </select>
                </> }
                

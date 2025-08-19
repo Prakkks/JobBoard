@@ -1,7 +1,6 @@
 import Login from './screens/Login.tsx';
 import HomePage from './screens/HomePage.tsx';
 import JobApplyPage from './screens/Dashboarddd.tsx';
-import JobDetailPage from './screens/JobDetailPage.tsx';
 import DetailedJobPage from './screens/DetailedJobPage.tsx';
 import JobPostPage from './screens/JobPostPage.tsx';
 import NotFound from './screens/NotFound.tsx';
@@ -26,8 +25,8 @@ const App = () => {
 
               <Route path="/" element={<HomePage />} />
               <Route path='/job-detail' element= {<ViewJob />} />
-              <Route path='/reviewer-screen' element= {<ReviwerScreen />} />
               <Route path="/detail-job/:id" element={<DetailedJobPage />} />
+
 
 
               <Route element= {<ProtectedRoute role={['reviewer']} />}>

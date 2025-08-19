@@ -202,7 +202,8 @@ import { APICALLHANDLER, type JobPostType, type JobPostTypeWColor } from "../con
 import JobDescriptionProp from "./JobDescriptionProp";
 import { JOBTYPE } from "../constants/enums";
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, MoveLeftIcon } from "lucide-react";
-import { details } from "framer-motion/client";
+import { Link,  useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 
 
 const colors = [
@@ -218,6 +219,7 @@ interface FetchDataProps {
   pageno?: number,
   location?: string,
   jobType?: 1|2|3|4,
+  title? : string, 
 }
 
 const ViewJob = () => {
@@ -228,17 +230,19 @@ const ViewJob = () => {
   const [totalPage, setTotalPage] = useState(1);
   const [fullArray, setFullArray] = useState<number[]>([]);
   const [ searchLocation , setSearchLocation  ] = useState<string>('');
+  const [ searchTitle , setSearchTitle  ] = useState<string>('');
   const [ jobType , setJobType  ] = useState<1|2|3|4>();
   const [loading,setLoading] = useState(true);
   const [viewdetailJob , setViewDetailedJob] = useState(false);
   const [DetailJob , SetDetailJob] = useState<JobPostType|null>(null);
+  const navigate = useNavigate();
 
 
-  const fetchalljobs = async ({ pageno = 1 , location = '', jobType   }: FetchDataProps = {}) => {
+  const fetchalljobs = async ({ pageno = 1 , location = '', jobType , title = ''   }: FetchDataProps = {}) => {
     const response = await APICALLHANDLER({
       method: 'get',
       url: '/api/job/getAllJobs',
-      params: { page: pageno , location: location , jobType: jobType },
+      params: { page: pageno , location: location , jobType: jobType , title : title },
       token: false
     });
 
@@ -270,18 +274,15 @@ const ViewJob = () => {
 
   useEffect(()=> {
      const timer = setTimeout(() => {},300);
-     fetchalljobs({location: searchLocation   });
+     fetchalljobs({location: searchLocation , title: searchTitle   });
      if (jobType != undefined)
      {
-     fetchalljobs({location: searchLocation , jobType:jobType   });
+     fetchalljobs({location: searchLocation , jobType:jobType , title: searchTitle   });
 
      }
-     
-
-    
-
+         
      return () => clearTimeout(timer);
-  },[searchLocation, jobType]);
+  },[searchLocation, jobType, searchTitle]);
 
   useEffect(() => {
     fetchalljobs();
@@ -294,7 +295,9 @@ const ViewJob = () => {
   }, [fullArray, totalPage]);
 
  const fetchDetailedJob = (id:string) => {
-    setViewDetailedJob(true);
+   const role = localStorage.getItem('role');
+   if (!role)
+   { setViewDetailedJob(true);
         const response = APICALLHANDLER({ method:'get', url: `/api/job/getJob/${id}` });
         response.then((response)=>{
           if (response)
@@ -303,39 +306,47 @@ const ViewJob = () => {
             SetDetailJob(response.data);
           }
         })
- }
 
- const handleApplyJobClick = ()=> {
-    
+    }
+
+    else 
+    {
+      navigate(`/detail-job/${id}`)
+    }
 
  }
 
 
 
   return (
-    <div className="sections bg-gray-100 min-h-[100vh] max-h-[100vh] flex flex-col md:flex-row w-full">
+    <div className="sections bg-gray-100 min-h-[110vh] max-h-[110vh] flex flex-col md:flex-row w-full">
     <section className={` flex flex-col gap-8 sm:flex-1/2 overflow-y-auto scrollbar-hide  `}>
       <h1 className="sm:text-2xl text-xl font-bold mt-5 " id="top">Listed Job</h1>
 
-      <div className="flex flex-row pr-3 items-center justify-between">
+      <div className="flex flex-col gap-2 sm:flex-row pr-3 sm:items-center  sm:justify-between">
         <input className=" bg-white outline-none p-2  w-full sm:w-1/3 rounded-xl" type="Search" placeholder="Search job based on Location E.g. Kathmandu " value={searchLocation} onChange={(e)=> { e.preventDefault(); setSearchLocation(e.target.value) }} />
-        <select className="outline-none "  onChange={(e) => {e.preventDefault(); const value = Number(e.target.value); if ([1, 2, 3, 4].includes(value)) { setJobType(value as 1 | 2 | 3 | 4); }else { setJobType(undefined); }}}>
+        <input className=" bg-white outline-none p-2  w-full sm:w-1/3 rounded-xl" type="Search" placeholder="Search job by Name E.g. Data Analyst " value={searchTitle} onChange={(e)=> { e.preventDefault(); setSearchTitle(e.target.value) }} />
+        <select className="outline-none w-fit "  onChange={(e) => {e.preventDefault(); const value = Number(e.target.value); if ([1, 2, 3, 4].includes(value)) { setJobType(value as 1 | 2 | 3 | 4); }else { setJobType(undefined); }}}>
           <option value="undefined">All</option>
           {[1,2,3,4].map((item)=> (
-            <option key={item} value={item}>{JOBTYPE[item]}</option>
+            <option key={item} className="sm:text-base text-sm" value={item}>{JOBTYPE[item]}</option>
           ))}
         </select>
       </div>
 
       {/* Even Jobs */}
       <div className={`grid ${ viewdetailJob ? 'grid-cols-1' : 'sm:grid-cols-2 grid-cols-1 xl:grid-cols-4 '} gap-y-5 gap-x-4 `}>
-        {evenListedJob && evenListedJob.map((job) => {
+        {evenListedJob && evenListedJob.map((job, index) => {
           const date = new Date(job.time);
           const now = new Date();
           const timeleft = Math.ceil((date.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
           const diffTime = now > date ? 'Expired' : timeleft < 1 ? 'Today' : timeleft < 20  ? `${timeleft} days left` : `${Math.ceil(timeleft / 30)} months left`;
          return (
-            <div className="rounded-xl p-1 group bg-white transition-all duration-300" key={job._id}>
+            <motion.div className="rounded-xl p-1 group bg-white transition-all duration-300" key={job._id}
+            initial = { {opacity: 0 , y: 0 }}
+            animate = {{ opacity:1 , y:0}}
+            transition={ { delay: index * 0.2 , }}
+            >
               <div className={`flex flex-col ${job.color} rounded-xl p-3 gap-2`}>
                 <div className="flex flex-row items-center text-center justify-between pr-4">
                   <div className="flex-col text-xs flex">
@@ -363,7 +374,7 @@ const ViewJob = () => {
                 </div>
                 <button className="px-4 py-2 rounded-2xl text-white font-semibold bg-gray-900 hover:bg-amber-950 cursor-pointer group-hover:bg-amber-800" onClick={()=> { fetchDetailedJob(job._id);  }}>View Details</button>
               </div>
-            </div>
+            </motion.div>
           );
         })}
       </div>
@@ -371,13 +382,16 @@ const ViewJob = () => {
       {/* Odd Jobs */}
       <div className={`grid ${ viewdetailJob ? 'grid-cols-1' : 'sm:grid-cols-2 grid-cols-1 xl:grid-cols-4 '} gap-y-5 gap-x-4 `}>
 
-        {oddListedJob && oddListedJob.map((job) => {
+        {oddListedJob && oddListedJob.map((job,index) => {
           const date = new Date(job.time);
           const now = new Date();
           const timeleft = Math.ceil((date.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
           const diffTime = now > date ? 'Expired' : timeleft < 1 ? 'Today' : timeleft < 20  ? `${timeleft} days left` : `${Math.ceil(timeleft / 30)} months left`;
           return (
-            <div className="rounded-xl p-1 group bg-white transition-all duration-300" key={job._id}>
+            <motion.div className="rounded-xl p-1 group bg-white transition-all duration-300" key={job._id}
+             initial = { {opacity: 0 , y: 0 }}
+            animate = {{ opacity:1 , y:0}}
+            transition={ { delay: index * 0.2 , }}>
               <div className={`flex flex-col ${job.color} rounded-xl p-3 gap-2`}>
                 <div className="flex flex-row items-center text-center justify-between pr-4">
                   <div className="flex-col text-xs flex">
@@ -397,9 +411,9 @@ const ViewJob = () => {
                   <p className="font-bold">Rs. {job.salary}/month</p>
                   <p className="font-thin text-gray-900">{job.location}</p>
                 </div>
-                <button className="px-4 py-2 rounded-2xl text-white font-semibold bg-gray-900 hover:bg-amber-950 cursor-pointer group-hover:bg-amber-800">Details</button>
+                <button  onClick={()=> { fetchDetailedJob(job._id);  }}  className="px-4 py-2 rounded-2xl text-white font-semibold bg-gray-900 hover:bg-amber-950 cursor-pointer group-hover:bg-amber-800">Details</button>
               </div>
-            </div>
+            </motion.div>
           );
         })}
       </div>
@@ -433,9 +447,10 @@ const ViewJob = () => {
 
 
 
-    { viewdetailJob && <div className="min-w-[60%] relative  p-5 mt-20">
-      <div className="p-2 shadow-md flex items-center justify-center absolute left-0 top-1/2"> <MoveLeftIcon size={18} /> </div> 
-    <div className="flex flex-col rounded-md shadow-md p-3 gap-3 bg-white sm:p-5 drop-shadow-gray-300">
+    { viewdetailJob && <div className="min-w-[60%]  p-5 mt-20">
+    <div className="flex flex-col rounded-md shadow-md relative  p-3 gap-3 bg-white sm:p-5 drop-shadow-gray-300">
+      <div onClick={()=> {setViewDetailedJob(false) }} className="p-2 shadow-md flex items-center justify-center absolute -left-3 rounded-full z-50 bg-white top-1/2"> <MoveLeftIcon size={18} /> </div> 
+         
           <div className="flex flex-row items-center">
             <div className="rounded-4xl w-13 h-13 lg:w-20 lg:h-20 sm:w-15 sm:h-15 p-2 items-center font-bold text-3xl justify-center flex bg-gray-200 ">
              
@@ -482,15 +497,11 @@ const ViewJob = () => {
             </p>
           </div>
 
-          <button
-            onClick={
-              handleApplyJobClick
-            }
-            className="px-3 outline-red-100 w-fit rounded-xl font-semibold hover:bg-gray-800 hover:text-white  text-gray-900 p-2"
-          >
-            {" "}
-            Apply Now ￫
-          </button>
+         
+          <Link   to="/login"
+          state={{ redirectToJobId: DetailJob?._id }}  className=" px-3 outline-red-100 w-fit rounded-xl font-semibold hover:bg-gray-800 hover:text-white  text-gray-900 p-2">Login and Apply Now  ￫</Link>
+          {/* <Link to={` /login?redirect=/detail-job/${DetailJob?._id}`}  className=" px-3 outline-red-100 w-fit rounded-xl font-semibold hover:bg-gray-800 hover:text-white  text-gray-900 p-2">Login and Apply Now  ￫</Link> */}
+
         </div>
     
     </div>}

@@ -116,7 +116,15 @@ export type JobApplied = {
 };
 
 
+export interface JwtPayload {
+  exp: number;       
+  iat?: number;      
+  role?: number;     
+  email: string;
+  name: string;
+  id : string;
 
+}
 
 type apiCallProps = {
     method: 'get' | 'post' | 'put' | 'delete',

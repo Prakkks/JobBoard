@@ -1,25 +1,31 @@
-import { Link, Navigate, useNavigate } from "react-router-dom";
-import { APICALLHANDLER, ConstantValue } from "../constants/constant";
-import { useContext,  useState } from "react";
+import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
+import { APICALLHANDLER, ConstantValue, type JwtPayload } from "../constants/constant";
+import { useContext,  useEffect,  useState } from "react";
 import { MyContext } from "../ContextProvider/Provider";
+// import { jwtDecode } from 'jwt-decoder';
+import { jwtDecode,  } from "jwt-decode";
+import { USER_ROLE } from "../constants/enums";
 
 interface Props {
   type: "SignIn" | "SignUp";
 }
 
 const Login = ({ type }: Props) => {
+  
 
 
 
 const navigate = useNavigate();
+const location = useLocation();
 const context = useContext(MyContext);
+const [alreadyloggedIn , setAlreadyLoggedIn] = useState(false);
   const [loading,setLoading] = useState(false);
   if (!context)
   {
     throw Error('error');
   }
-  const {setUser ,setShowUserTitle, user} = context;
-  const [selectedrole, setSelectedRole] = useState<'admin'|'user'|'reviewer' |'' >("");
+  const {setUser ,setShowUserTitle} = context;
+  const [selectedrole, setSelectedRole] = useState<number>(1);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -27,6 +33,7 @@ const context = useContext(MyContext);
 
   });
 
+  
  
   const handleClick = () => {
     if (type == "SignIn") {
@@ -40,7 +47,7 @@ const context = useContext(MyContext);
     e.preventDefault();
     
     setLoading(true);
-    let data:{ name?: string; email: string; password: string; role?: string } = {
+    let data:{ name?: string; email: string; password: string; role?: number } = {
         'email' : formData.email,
         'password' : formData.password,
         
@@ -66,13 +73,28 @@ const context = useContext(MyContext);
           // const role = response.data.role;
           const tokens = JSON.stringify(response.data['token']);
           localStorage.setItem('token', tokens);
-          localStorage.setItem('role',response.data.role);
-          localStorage.setItem('name',response.data.name);
-          localStorage.setItem('email',response.data.email);
-          setUser({'name':response.data.name, 'email': response.data.email, 'role':response.data.role});
+
+          const decoded = jwtDecode<JwtPayload>(JSON.parse(tokens));
+          localStorage.setItem('name',decoded.name);
+          localStorage.setItem('email',decoded.email);
+          localStorage.setItem('role',USER_ROLE[decoded?.role ?? 1] );
+          console.log('decoded = ', decoded);
+          setUser({'name':decoded.name, 'email': decoded.email, 'role':USER_ROLE[decoded?.role ?? 1] });
           setShowUserTitle(true);
 
-          navigate('/');
+          // navigate('/');
+           const redirectToJobId = location.state?.redirectToJobId;
+           if (redirectToJobId) {
+             navigate(`/detail-job/${redirectToJobId}`, { replace: true });
+              }
+            else if (  decoded.role === USER_ROLE.reviewer)
+              {
+            navigate("/reviewer-screen", { replace: true }); 
+
+              }  
+              else  {
+            navigate("/job-detail", { replace: true }); 
+            }
         
           
         }
@@ -97,17 +119,23 @@ const context = useContext(MyContext);
 
 
   const handleRadioChange = (e:React.ChangeEvent<HTMLInputElement>)=> {
-      setSelectedRole(e.target.value as 'admin'| 'user' | '')
+      setSelectedRole(parseInt(e.target.value) )
   }
 
   const handleFormValueChange = (e:React.ChangeEvent<HTMLInputElement>)=> {
     const {name,value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   }
-  console.log('user = ',user?.role);
-  if (user?.role)
-  return <Navigate to="/dashboard" />;
 
+  useEffect(()=> {
+    setAlreadyLoggedIn( localStorage.getItem('role') !== null  );
+  },[]);
+
+ 
+  if(alreadyloggedIn)
+  return <Navigate to="/dashboard" />
+
+  
   return (
     <section className="h-[100vh] p-5 flex flex-col gap-10 bg-[#f3f2f1] justify-center items-center  ">
 
@@ -172,8 +200,8 @@ const context = useContext(MyContext);
             required
             name="category"
             className=""
-            value={'admin'}
-            checked = {selectedrole === 'admin'}
+            value={USER_ROLE['admin']}
+            checked = {selectedrole === USER_ROLE['admin']}
             onChange={handleRadioChange}
 
           />
@@ -186,8 +214,8 @@ const context = useContext(MyContext);
             required
             name="category"
             className=""
-            value={'user'}
-            checked = {selectedrole === 'user'}
+            value={USER_ROLE['user']}
+            checked = {selectedrole ===  USER_ROLE.user}
             onChange={handleRadioChange}
 
           />
@@ -199,6 +227,7 @@ const context = useContext(MyContext);
           <button
             type="submit"
             className="mt-5 w-full p-2 bg-gray-700 rounded-xl text-white "
+            disabled = {loading}
           >
             {
                 loading == true ? ' Loading...' :   `${type == "SignIn" ? "Continue ➞" : "Sign Up ➞"}`
@@ -226,3 +255,5 @@ const context = useContext(MyContext);
 };
 
 export default Login;
+
+

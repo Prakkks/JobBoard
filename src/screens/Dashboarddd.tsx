@@ -5,7 +5,7 @@ import { APICALLHANDLER, type JobApplied, type JobPosted } from "../constants/co
 import { createColumnHelper, flexRender, getCoreRowModel, getPaginationRowModel, useReactTable ,  } from "@tanstack/react-table";
 import { User, Building2, CalendarCheck, PencilIcon,  Workflow } from 'lucide-react';
 import UpdateJobPostForm from "../Components/UpdateJobPostForm";
-import { STATUS } from "../constants/enums";
+import { JOBTYPE, STATUS } from "../constants/enums";
 
 
 
@@ -52,7 +52,7 @@ const [pagination, setPagination] = useState({
       const responses = APICALLHANDLER({ url: '/api/job/alljobByAdmin' , method: 'get' });
       responses.then((response)=> {
         if (response)
-         { setJob([...response.jobs]);}
+         { setJob([...response.data]);}
         else 
         {
           setJob([]);
@@ -65,7 +65,7 @@ const [pagination, setPagination] = useState({
       responses.then((response)=> {
         console.log("From Dashboard" ,response);
         if (response)
-        setAppliedJob([...response.jobs]);
+        setAppliedJob([...response.data]);
       else 
         setAppliedJob([]);
       })
@@ -175,7 +175,7 @@ const [pagination, setPagination] = useState({
     )
     }),
      userColumnHelper.accessor('job.jobType', {
-      cell: info => info.getValue(),
+      cell: info => JOBTYPE[info.getValue() as number ?? 0] ,
       header: ()=> (
         <span className="dashboard-table-title">
           <Building2 className='mr-2' size={16}   /> Job Type
@@ -252,6 +252,10 @@ const admintable = useReactTable({
     return (
     <section className="sections  ">
       <div className="overflow-x-auto sm:p-10">
+        <p className="text-gray-600 mb-4">
+{ role=='user' && ' This table lists the jobs that you have applied to.'}
+{ role=='admin' && '  This table lists all the jobs you have posted.'}
+        </p>
         <table className="min-w-full divide-y divide-gray-200 text-left border-gray-300 border-1">
           <thead className="bg-gray-100  ">
             { role == 'admin' &&   admintable.getHeaderGroups().map((headerGroup)=>(
@@ -352,7 +356,7 @@ const admintable = useReactTable({
 
      
       { role == 'admin' && 
-       <div className="flex flex-row justify-between"> 
+       <div className="flex flex-row justify-between mt-5"> 
  
     <div className="flex flex-row gap-3 items-center"> 
     <p className="font-semibold">Entries per page:</p>  
@@ -396,8 +400,7 @@ const admintable = useReactTable({
   </div>
 </div>}
 
- { role == 'user' && 
-       <div className="flex flex-row justify-between"> 
+ { role == 'user' &&  <div className="flex flex-row justify-between"> 
  
     <div className="flex flex-row gap-3 items-center"> 
     <p className="font-semibold">Entries per page:</p>  

@@ -43,17 +43,10 @@ const UpdateJobPostForm = ({job_id, setUpdateRow, updaterow, fetchjobs}: Props) 
 
     }
 
-    useEffect(()=> {
-        console.log(' data from row = ');
-            
-        console.log( updaterow?._id , updaterow?.company , updaterow?.description , updaterow?.title);
+    useEffect(()=> {            
         if (updaterow)
         setcurrentIDData(updaterow);
-        // const responses = APICALLHANDLER({ method: 'get' , url : `/api/job/getJob/${job_id}` });
-        // responses.then((response)=> {
-        //     console.log(response);
-        //     setcurrentIDData(response.job);
-        // });
+      
         return ()=> {};
     },[]);
 
