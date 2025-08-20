@@ -2,14 +2,18 @@ import { useEffect, useState } from "react"
 import { APICALLHANDLER, type JobPostType } from "../constants/constant";
 import { createColumnHelper, flexRender, getCoreRowModel, getPaginationRowModel, useReactTable, type ColumnDef } from "@tanstack/react-table";
 import { JOBTYPE } from "../constants/enums";
-import { ChevronLeft, User } from "lucide-react";
+import { ChevronLeft,  User } from "lucide-react";
 import PaginationComponent from "../Components/ReviewerComponent/Pagination";
 import DetailJobView from "../Components/DetailJobView";
+import { useForm } from "react-hook-form";
 
 interface overalldataProps 
 { 'title': string , 'count' : number | undefined  }
 
-
+interface RejectFormProp
+{
+  reaso : string,
+}
 
 
 
@@ -20,14 +24,17 @@ const ReviwerScreen = () => {
     const [pagination, setPagination] = useState({pageIndex: 0,pageSize: 3,});
     const [DetailJobCurrentIndex, SetDetailJobCurrentIndex] = useState<JobPostType|null>(null);
     const [hideColumn , setHideColumn] = useState(true);
-    const [isSubmitting , setIsSubmitting] = useState(false);
-
+    const [isSubmittings , setIsSubmittings] = useState(false);
+    const [rejectedClicked , setRejectedClicked] = useState(false);
+    const { register , formState : {errors  , isSubmitting} , reset , handleSubmit  } = useForm<RejectFormProp>();
     const [overalldata , setOveralldata] = useState<overalldataProps[]>([
         { 'title': 'Total Job', 'count': undefined },
         { 'title': 'Approved Job', 'count': undefined },
         { 'title': 'Pending Job', 'count': undefined },
         { 'title': 'Rejected Job', 'count': undefined },
     ]);
+
+    
 
     useEffect((
         
@@ -55,7 +62,7 @@ const ReviwerScreen = () => {
 },[]);
 
  const handleApproveJob = async(id: string)=> {
-    setIsSubmitting(true);
+    setIsSubmittings(true);
     const responses = APICALLHANDLER({ method: 'put' , url: `/api/job/acceptJob/${id}`})
     responses.then((response)=> {
         if(response)
@@ -68,12 +75,12 @@ const ReviwerScreen = () => {
           
         }
     })
-    setIsSubmitting(false);
+    setIsSubmittings(false);
  };
 
-  const handleRejectJob = async(id: string)=> {
-    setIsSubmitting(true);
-    const responses = APICALLHANDLER({ method: 'put' , url: `/api/job/rejectJob/${id}`})
+  const handleRejectJob = async(id: string , reaso: string)=> {
+    setIsSubmittings(true);
+    const responses = APICALLHANDLER({ method: 'put' , url: `/api/job/rejectJob/${id}` , data: {'reaso': reaso }});
     responses.then((response)=> {
         if(response)
         {
@@ -81,10 +88,11 @@ const ReviwerScreen = () => {
             SetDetailJobCurrentIndex(null);
             setHideColumn(true);
             fetchRejectedJob();
+            reset();
           
         }
     })
-    setIsSubmitting(false);
+    setIsSubmittings(false);
  };
 
  const fetchPendingJobs= () => {
@@ -226,10 +234,10 @@ const jobPendingColumns = [
               onClick={() => handleApproveJob(rowdata._id)}
               className="p-1 text-green-500 font-semibold rounded-xl text-sm hover:underline cursor-pointer"
             >
-              { isSubmitting ? 'Approving' : 'Approve Job'}
+              { isSubmittings ? 'Approving' : 'Approve Job'}
             </button>
             <button
-            onClick={()=> {handleRejectJob(rowdata._id)}}
+            onClick={()=> {setRejectedClicked(true); SetDetailJobCurrentIndex(rowdata);}}
             className="p-1 text-red-600 font-semibold rounded-xl text-sm hover:underline cursor-pointer">
               { isSubmitting ? 'Rejecting' : 'Reject'}
             </button>
@@ -278,10 +286,15 @@ const pendingjobTable =  useReactTable(
     }
 );
 
-
+const submitRejectForm = (data: RejectFormProp) => {
+            console.log(data.reaso  ,"= data");
+            if (DetailJobCurrentIndex)
+            handleRejectJob(DetailJobCurrentIndex._id , data.reaso);
+            setRejectedClicked(false);
+    }
 
   return (
-    <section className="sections flex flex-col  bg-gray-100 gap-5 sm:gap-7">
+    <section className="sections flex flex-col  bg-gray-100 gap-5 sm:gap-7 relative ">
         <h1 className=" text-xl sm:text-2xl  font-bold text-black " > Reviwer DashBoard </h1>
         <div className=" flex flex-col sm:flex-row max-h-[60vh]  gap-3  ">
        <div className="flex-col flex gap-5 sm:gap-7  flex-1/2  "> 
@@ -366,8 +379,8 @@ const pendingjobTable =  useReactTable(
             <DetailJobView DetailJobCurrentIndex={DetailJobCurrentIndex}  />
            
             <div className="flex flex-row gap-5 my-3  ">
-                <button onClick={()=> {handleApproveJob(DetailJobCurrentIndex._id)}} className="p-2 cursor-pointer   hover:bg-green-700 bg-green-600 text-white rounded-sm font-semibold">{ isSubmitting ? 'Approving' : 'Approve Job'}</button>
-                <button onClick={()=> {handleRejectJob(DetailJobCurrentIndex._id)}} className="p-2 cursor-pointer   hover:bg-red-700 bg-red-600 text-white rounded-sm font-semibold"> { isSubmitting ?'Rejecting' :'Reject Job'}</button>
+                <button onClick={()=> {handleApproveJob(DetailJobCurrentIndex._id)}} className="p-2 cursor-pointer   hover:bg-green-700 bg-green-600 text-white rounded-sm font-semibold">{ isSubmittings ? 'Approving' : 'Approve Job'}</button>
+                <button onClick={()=> {setRejectedClicked(true);}} className="p-2 cursor-pointer   hover:bg-red-700 bg-red-600 text-white rounded-sm font-semibold"> { isSubmitting ?'Rejecting' :'Reject Job'}</button>
             </div>
            
     </div>
@@ -439,7 +452,49 @@ const pendingjobTable =  useReactTable(
         }
         </div>
     </div>
+        
+       {rejectedClicked && (
+  <>
+   
+    <div
+      className="fixed inset-0 bg-white/50 z-40"
+      onClick={() => setRejectedClicked(false)}
+    ></div>
+
   
+    <div className="fixed inset-0 flex items-center justify-center z-50">
+      <div className="w-fit bg-white shadow-md p-5 rounded-xl">
+        <form className="flex flex-col gap-3" onSubmit={handleSubmit(submitRejectForm)}>
+          <h1 className="font-semibold">Enter Reason for Rejection:</h1>
+          <textarea
+            minLength={2}
+            {...register('reaso',{ required: "Reason is required", minLength: { value: 2, message: "Reason must be at least 2 characters" }})}
+
+            placeholder="Describe reason for the rejection.."
+            className="sm:w-[25vw] h-[20vh] resize-none border p-3 focus:outline-none focus:ring-1 overflow-y-auto"
+          />
+             {errors.reaso && <p className="text-red-500">{errors.reaso.message}</p>}
+          <div className="flex flex-row items-center w-full gap-2">
+            <button
+              type="submit"
+              
+              className="w-full p-2 bg-green-600 rounded-xl text-white hover:bg-white hover:text-green-500 hover:border transition font-semibold"
+            >
+              {!isSubmitting ? 'Reject Job ' : 'Rejecting..'}
+            </button>
+            <div
+              onClick={() => setRejectedClicked(false)}
+              className="w-full p-2 text-center rounded-xl bg-red-500 text-white hover:border hover:text-red-400 hover:bg-white transition cursor-pointer font-semibold"
+            >
+              Cancel
+            </div>
+          </div> 
+        </form>
+      </div>
+    </div>
+  </>
+)}
+
 
     </section>
   )

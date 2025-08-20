@@ -51,6 +51,7 @@ export type JobPosted = {
   company: string;
   updatedAt : string;
   time: string;
+  rejectionReason?: string | null;
 };
 
 export type JobPostType = {
@@ -151,9 +152,9 @@ export async function APICALLHANDLER ({method ,data ,header , url, params ,token
       }
     }
         const response =  (method == 'get' || method == 'delete') ?    
-        await axios[method](`${base_url}${url}` , {params ,headers: header, timeout:30000 })
+        await axios[method](`${base_url}${url}` , {params ,headers: header, timeout:3000 })
         : 
-        await axios[method](`${base_url}${url}` ,data, {params ,headers: header, timeout:30000 });
+        await axios[method](`${base_url}${url}` ,data, {params ,headers: header, timeout:3000 });
         if (method !== 'get')
         toast.success(response.data.message);
         return response.data;

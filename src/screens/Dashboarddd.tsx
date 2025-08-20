@@ -2,10 +2,11 @@
 import { useEffect,  useState } from "react";
 import DeletePopUp from "../Components/DeletePopUp";
 import { APICALLHANDLER, type JobApplied, type JobPosted } from "../constants/constant";
-import { createColumnHelper, flexRender, getCoreRowModel, getPaginationRowModel, useReactTable ,  } from "@tanstack/react-table";
+import { createColumnHelper, flexRender, getCoreRowModel, getPaginationRowModel, getSortedRowModel, useReactTable, type SortingState ,  } from "@tanstack/react-table";
 import { User, Building2, CalendarCheck, PencilIcon,  Workflow } from 'lucide-react';
 import UpdateJobPostForm from "../Components/UpdateJobPostForm";
 import { JOBTYPE, STATUS } from "../constants/enums";
+import RejectJobPostForm from "../Components/RejectedJobPopUp";
 
 
 
@@ -16,12 +17,13 @@ const JobApplyPage = () => {
   const [title , setTitle] = useState<string> ('job');
   const [currentJobId , setCurrentJobId] = useState('');
   const [updateRow , setUpdateRow] = useState<JobPosted | null>(null);
+  const [rejectedRow , setRejectedRow] = useState<JobPosted | null>(null);
   const [currentActionJob , setCurrentActionJob] = useState<JobPosted | JobApplied | null>(null);
   const role = localStorage.getItem("role") || null;
-  // const [data,SetData] = useState();
 
-  // tanstack-table index for pagination
-const [pagination, setPagination] = useState({
+  const [sorting , setSorting] = useState<SortingState>([])
+
+  const [pagination, setPagination] = useState({
   pageIndex: 0,
   pageSize: 3,
 });
@@ -125,6 +127,7 @@ const [pagination, setPagination] = useState({
       <Workflow className="mr-2" size={16} /> STATUS
     </span>
       ),
+    enableSorting: false,
     }),
 
     adminColumnHelper.display({
@@ -136,16 +139,28 @@ const [pagination, setPagination] = useState({
       },
       cell: (info) => {
         const rowdata = info.row.original;
-        // console.log('rowdata = ',rowdata); 
        
            return (
           <div className="flex flex-row gap-2">
-                      {  rowdata.status !== STATUS['REJECTED']  &&   <button className={`${updateRow != null || currentActionJob != null ? "cursor-not-allowed opacity-50": "cursor-pointer" }`} disabled= {updateRow != null || currentActionJob !=null }   onClick={()=> {   setUpdateRow(rowdata);  }}  >  {/*  for update */} 
+                       <button className={`relative group ${updateRow != null || currentActionJob != null ? "cursor-not-allowed opacity-50": "cursor-pointer" }`} disabled= {updateRow != null || currentActionJob !=null }   onClick={()=> {   setUpdateRow(rowdata);  }}  >  {/*  for update */} 
                            <img className="h-5 w-5" src="/Icons/edit.png" />
-                         </button>}
-                         <button className={`${updateRow != null || currentActionJob != null ? "cursor-not-allowed opacity-50": "cursor-pointer" }`} disabled= {updateRow != null || currentActionJob !=null } onClick={()=>{setCurrentActionJob(rowdata); setTitle(rowdata.title); setCurrentJobId(rowdata._id); }}>
-                         {/* <button className="cursor-pointer " > */}
+                         <p className="tooltip">Edit</p>
+
+                         </button>
+                         { 
+                         rowdata.status == STATUS['REJECTED']  &&  <><button className={`relative group  ${updateRow != null || currentActionJob != null ? "cursor-not-allowed opacity-50": "cursor-pointer" }`} disabled= {updateRow != null || currentActionJob !=null }   onClick={()=> {   setRejectedRow(rowdata);  }}  >  {/*  for update */} 
+                           <img className="h-5 w-5" src="/Icons/expand.png" />
+                         <p className="tooltip">View Reason</p>
+                         </button>
+
+                         </> }
+                        
+ 
+
+                         <button className={` relative group ${updateRow != null || currentActionJob != null ? "cursor-not-allowed opacity-50": "cursor-pointer" }`} disabled= {updateRow != null || currentActionJob !=null } onClick={()=>{setCurrentActionJob(rowdata); setTitle(rowdata.title); setCurrentJobId(rowdata._id); }}>
                            <img className="h-5 w-5" src="/Icons/delete.png" />
+                         <p className="tooltip">Delete</p>
+
                          </button>
                        </div>
         )
@@ -234,7 +249,9 @@ const admintable = useReactTable({
   columns: adminColumns,
   getCoreRowModel: getCoreRowModel(),
   getPaginationRowModel: getPaginationRowModel(),
-  state: { pagination },
+  getSortedRowModel: getSortedRowModel(),
+  state: { pagination , sorting },
+  onSortingChange: setSorting,
   onPaginationChange: setPagination,
 });
 
@@ -243,8 +260,10 @@ const admintable = useReactTable({
     data: appliedjob ,
     columns : userColumns , 
     getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel : getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-     state: { pagination },
+     state: { pagination , sorting },
+     onSortingChange: setSorting,
   onPaginationChange: setPagination,
   });
 
@@ -262,15 +281,19 @@ const admintable = useReactTable({
                 <tr key={headerGroup.id} className="px-2 py-3"> 
                 {
                   headerGroup.headers.map((column)=>(
-                    <td key={column.id}>
-                       {column.isPlaceholder
-                    ? null
-                    : flexRender(
-                        column.column.columnDef.header,
-                        column.getContext()
-                      )}
-
-                    </td>
+                    <th
+                      key={column.id}
+                      onClick={column.column.getToggleSortingHandler()}
+                      className="cursor-pointer "
+                    >
+                      <div className="flex  text-center  items-center ">
+                      {flexRender(column.column.columnDef.header, column.getContext())}
+                      {{
+                        asc: "↑",
+                        desc: "↓",
+                      }[column.column.getIsSorted() as string] ?? null}
+                      </div>
+                    </th>
                   ))
                 }
                 
@@ -280,15 +303,19 @@ const admintable = useReactTable({
                 <tr key={headerGroup.id} className="px-2 py-3"> 
                 {
                   headerGroup.headers.map((column)=>(
-                    <td key={column.id}>
-                       {column.isPlaceholder
-                    ? null
-                    : flexRender(
-                        column.column.columnDef.header,
-                        column.getContext()
-                      )}
-
-                    </td>
+                      <th
+                      key={column.id}
+                      onClick={column.column.getToggleSortingHandler()}
+                      className="cursor-pointer "
+                    >
+                      <div className="flex  text-center  items-center ">
+                      {flexRender(column.column.columnDef.header, column.getContext())}
+                      {{
+                        asc: "↑",
+                        desc: "↓",
+                      }[column.column.getIsSorted() as string] ?? null}
+                      </div>
+                    </th>
                   ))
                 }
                 
@@ -458,7 +485,10 @@ const admintable = useReactTable({
       {
         updateRow && <UpdateJobPostForm job_id={updateRow._id} setUpdateRow={setUpdateRow} fetchjobs={fetchjobs}  updaterow={updateRow} />
       }
+      {
+        rejectedRow && <RejectJobPostForm  setRejectedRow={setRejectedRow}   rejectrow={rejectedRow} />
 
+      }
    
     </section>
   );

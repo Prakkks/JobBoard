@@ -4,6 +4,8 @@ import type { JobSchemaType } from "../Validation/validate";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
+
+
 const JobPostPage = () => {
   // const { register, formState: {errors, isSubmitting } , reset, handleSubmit  } = useForm({ resolver: zodResolver(jobschema) });
   const [postJob, setPostJob] = useState(false);

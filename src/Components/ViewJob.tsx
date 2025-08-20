@@ -204,6 +204,7 @@ import { JOBTYPE } from "../constants/enums";
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, MoveLeftIcon } from "lucide-react";
 import { Link,  useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useQuery } from "@tanstack/react-query";
 
 
 const colors = [
@@ -260,6 +261,9 @@ const ViewJob = () => {
       setTotalPage(totalPages);
       setFullArray([...Array(totalPages).keys()].map((_, i) => i + 1));
     }
+
+     
+
   };
 
   const handlePagination = (n: number) => {

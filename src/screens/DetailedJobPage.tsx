@@ -6,8 +6,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { IndividualJobApplySchema, type IndividualJobApplySchemaType } from "../Validation/validate";
 import { JOBTYPE } from "../constants/enums";
 import { toast } from "react-toastify";
-import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
-import { Carousel } from 'react-responsive-carousel';
 
 const DetailedJobPage = () => {
   const name: string = localStorage.getItem("name") || "";
@@ -18,7 +16,7 @@ const DetailedJobPage = () => {
   const [alljob , setallJob] = useState<JobListValues[] | null>([]);
   const [Apply, setApply] = useState(false);
   const [rerender , setRerender] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [_, setLoading] = useState(false);
 
 
   const { register ,  formState: { errors ,isSubmitting}, handleSubmit , setValue ,reset } = useForm({ resolver : zodResolver(IndividualJobApplySchema) , defaultValues : {email: email , name:name}} );
@@ -45,6 +43,25 @@ const DetailedJobPage = () => {
 
   }, [rerender]);
 
+  // const  {data: DetailedJob  , isLoading:DetailedJobLoading , error:detailedJobError   } = useQuery({
+  //    queryKey: ['detailedJob' , id],
+  //    queryFn: async () => {
+  //   const response = await axios.get(`/api/job/getAllJobs`);
+  //   return response; // only return the actual job data
+  // },
+     
+  // });
+
+
+  //   useEffect(() => {
+  //     if (DetailedJob)
+  //       console.log(DetailedJob);
+  //   if (DetailedJob?.data) {
+  //     setJob(DetailedJob.data);
+  //     setRerender(false);
+  //     setLoading(false);
+  //   }
+  // }, [DetailedJob]);
   
 
  
@@ -127,10 +144,12 @@ const DetailedJobPage = () => {
         {/* serarch job filter based on  location  */}
 
         {/* body */}
-        {!loading && <div className="flex flex-col rounded-md bg-white shadow-md shadow-white p-3 gap-3 sm:p-5 ">
+        {/* {detailedJobError && <p> {detailedJobError.message}</p>} */}
+        {/* {DetailedJobLoading && <p> hi </p>} */}
+        { <div className="flex flex-col rounded-md bg-white shadow-md shadow-white p-3 gap-3 sm:p-5 ">
           <div className="flex flex-row items-center">
             <div className="rounded-4xl w-13 h-13 lg:w-20 lg:h-20 sm:w-15 sm:h-15 p-2 items-center font-bold text-3xl justify-center flex bg-gray-200 ">
-              {" "}
+              
               {job?.title[0].toUpperCase()}{" "}
             </div>
             <div className="flex flex-col p-3">
